@@ -27,6 +27,7 @@ export type RecoveryPolicy = {
   maximumContactsPer72Hours: number;
   quietHoursStart: number;
   quietHoursEnd: number;
+  upiAutopayAfaThreshold: number;
 };
 
 export type RecoveryAction =
@@ -53,6 +54,7 @@ export const defaultPolicy: RecoveryPolicy = {
   maximumContactsPer72Hours: 2,
   quietHoursStart: 21,
   quietHoursEnd: 8,
+  upiAutopayAfaThreshold: 15_000,
 };
 
 const confidenceByReason: Record<FailureReason, number> = {
@@ -65,8 +67,9 @@ const confidenceByReason: Record<FailureReason, number> = {
   unknown: 0.48,
 };
 
-function selectAction(event: RecoveryEvent): RecoveryAction {
+function selectAction(event: RecoveryEvent, policy: RecoveryPolicy): RecoveryAction {
   if (!event.issuerHealthy) return 'WAIT_FOR_ISSUER';
+  if (event.rail === 'upi_autopay' && event.amount > policy.upiAutopayAfaThreshold) return 'REQUEST_AUTHENTICATION';
 
   switch (event.failureReason) {
     case 'insufficient_balance': return 'SMART_RETRY';
@@ -95,7 +98,7 @@ function nextSafeExecutionTime(event: RecoveryEvent, policy: RecoveryPolicy) {
 }
 
 export function planRecovery(event: RecoveryEvent, policy: RecoveryPolicy = defaultPolicy): RecoveryPlan {
-  const action = selectAction(event);
+  const action = selectAction(event, policy);
   const contactRequired = requiresCustomerContact(action);
   const contactCapPassed = !contactRequired || event.contactsLast72Hours < policy.maximumContactsPer72Hours;
   const consentPassed = !contactRequired || event.hasMessagingConsent;
@@ -106,6 +109,7 @@ export function planRecovery(event: RecoveryEvent, policy: RecoveryPolicy = defa
     { name: 'Contact frequency cap', passed: contactCapPassed, detail: `${event.contactsLast72Hours}/${policy.maximumContactsPer72Hours} contacts in 72h` },
     { name: 'Messaging consent', passed: consentPassed, detail: contactRequired ? (event.hasMessagingConsent ? 'Consent verified' : 'Consent missing') : 'No message required' },
     { name: 'High-value approval', passed: valueGatePassed, detail: `${event.amount} against ${policy.humanApprovalAbove} threshold` },
+    { name: 'UPI AutoPay AFA route', passed: event.rail !== 'upi_autopay' || event.amount <= policy.upiAutopayAfaThreshold || action === 'REQUEST_AUTHENTICATION', detail: `${event.amount} against ${policy.upiAutopayAfaThreshold} no-AFA threshold` },
     { name: 'Known failure taxonomy', passed: knownFailure, detail: event.failureReason },
   ];
 

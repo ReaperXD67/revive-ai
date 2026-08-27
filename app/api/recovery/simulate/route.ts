@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const event: RecoveryEvent = {
     eventId: payload.eventId,
     customerId: payload.customerId,
-    amount: payload.amount ?? 24_999,
+    amount: payload.amount ?? 11_999,
     failureReason: payload.failureReason,
     rail: payload.rail,
     occurredAt: payload.occurredAt ?? new Date().toISOString(),

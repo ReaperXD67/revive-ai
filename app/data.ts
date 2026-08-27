@@ -18,7 +18,7 @@ export type RecoveryCase = {
 
 export const recoveryCases: RecoveryCase[] = [
   {
-    id: 'CASE-4821', initials: 'NM', customer: 'Nisha Menon', plan: 'Pro annual', amount: 24999,
+    id: 'CASE-4821', initials: 'NM', customer: 'Nisha Menon', plan: 'Pro annual', amount: 11999,
     failure: 'Insufficient balance', method: 'UPI AutoPay', confidence: 94,
     action: 'Retry Fri, 09:10', eta: '18h', status: 'Queued', accent: '#ffd6c9',
     signals: ['Salary window begins Friday', '2/2 previous retries succeeded', 'No contact needed'],
