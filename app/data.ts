@@ -1,4 +1,4 @@
-export type NavView = 'command' | 'queue' | 'playbooks' | 'experiments' | 'audit';
+export type NavView = 'command' | 'queue' | 'playbooks' | 'experiments' | 'audit' | 'proof';
 
 export type RecoveryCase = {
   id: string;

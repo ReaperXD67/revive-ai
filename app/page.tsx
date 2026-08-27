@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Activity, ArrowRight, ArrowUpRight, Bell, Bot, Check, CheckCircle2,
   ChevronDown, ChevronRight, CircleAlert, CircleDollarSign, Clock3, Command,
-  Copy, FileCheck2, FlaskConical, Gauge, Layers3, ListFilter, LockKeyhole,
+  Copy, FileCheck2, Fingerprint, FlaskConical, Gauge, Layers3, ListFilter, LockKeyhole,
   Menu, MoreHorizontal, PauseCircle, Play, RadioTower, RefreshCw, Search,
   Send, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, TrendingUp,
   UserCheck, Webhook, X, Zap,
@@ -14,6 +14,7 @@ import {
   recoveryCases, researchFacts, type NavView, type RecoveryCase,
 } from './data';
 import type { RecoveryPlan } from '../lib/recovery-engine';
+import { SystemProof } from './system-proof';
 
 const navItems = [
   { id: 'command' as NavView, label: 'Command center', icon: Command },
@@ -21,14 +22,16 @@ const navItems = [
   { id: 'playbooks' as NavView, label: 'Agent playbooks', icon: Bot },
   { id: 'experiments' as NavView, label: 'Experiments', icon: FlaskConical },
   { id: 'audit' as NavView, label: 'Audit trail', icon: ShieldCheck },
+  { id: 'proof' as NavView, label: 'System proof', icon: Fingerprint },
 ];
 
 const viewMeta: Record<NavView, { eyebrow: string; title: string; description: string }> = {
-  command: { eyebrow: 'THURSDAY, 27 AUGUST', title: 'Revenue command center', description: 'Your autonomous recovery operation, in one view.' },
+  command: { eyebrow: 'SIMULATED PORTFOLIO · LIVE BACKEND', title: 'Revenue command center', description: 'Your autonomous recovery operation, in one view.' },
   queue: { eyebrow: '68 OPEN CASES', title: 'Recovery queue', description: 'Every failed payment, ranked by recoverability and value.' },
   playbooks: { eyebrow: '4 ACTIVE ROUTES', title: 'Agent playbooks', description: 'Failure-aware strategies with explicit autonomy boundaries.' },
   experiments: { eyebrow: 'CAUSAL MEASUREMENT', title: 'Recovery experiments', description: 'Prove incremental revenue with holdouts, not vanity attribution.' },
   audit: { eyebrow: 'IMMUTABLE DECISIONS', title: 'Agent audit trail', description: 'Inspect the evidence, policies, and tools behind every action.' },
+  proof: { eyebrow: 'LIVE ENGINEERING EVIDENCE', title: 'System proof', description: "Challenge the backend. Do not take the interface's word for it." },
 };
 
 const formatMoney = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
@@ -145,14 +148,14 @@ export default function Home() {
         <div className="nav-section-label">OPERATE</div>
         <nav aria-label="Primary navigation">
           {navItems.map(({ id, label, icon: Icon, count }) => (
-            <button className={view === id ? 'nav-item active' : 'nav-item'} key={id} onClick={() => chooseView(id)}>
+            <button className={view === id ? 'nav-item active' : 'nav-item'} key={id} onClick={() => chooseView(id)} aria-current={view === id ? 'page' : undefined}>
               <Icon size={17} strokeWidth={1.8} /><span>{label}</span>{count ? <b>{count}</b> : null}
             </button>
           ))}
         </nav>
         <div className="nav-section-label secondary-label">SYSTEM</div>
-        <button className="nav-item"><Webhook size={17} /><span>Connections</span><i className="healthy-dot" /></button>
-        <button className="nav-item"><Settings2 size={17} /><span>Guardrails</span></button>
+        <button className="nav-item" onClick={() => chooseView('proof')} aria-label="Inspect live backend connections"><Webhook size={17} /><span>Connections</span><i className="healthy-dot" /></button>
+        <button className="nav-item" onClick={() => chooseView('audit')} aria-label="Inspect recovery guardrails"><Settings2 size={17} /><span>Guardrails</span></button>
         <div className="autopilot-card">
           <div className="status-line"><span className="pulse" /> AUTOPILOT LIVE</div>
           <strong>₹3.84L recovered</strong>
@@ -169,6 +172,7 @@ export default function Home() {
           <div><p className="eyebrow">{meta.eyebrow}</p><h1>{meta.title}</h1><span className="view-description">{meta.description}</span></div>
           <div className="topbar-actions">
             <label className="global-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && query.trim()) chooseView('queue'); }} placeholder="Search customers" aria-label="Search customers" /><kbd>↵</kbd></label>
+            <button className="backend-proof-link" onClick={() => chooseView('proof')}><i /> Backend live</button>
             <button className="icon-button" aria-label="Notifications"><Bell size={17} /><i /></button>
             <button className="demo-button" onClick={openDemo}><Play size={14} fill="currentColor" /> Run live demo</button>
             <button className="avatar" aria-label="Open account menu">AK</button>
@@ -180,6 +184,7 @@ export default function Home() {
         {view === 'playbooks' && <Playbooks onToast={setToast} />}
         {view === 'experiments' && <Experiments />}
         {view === 'audit' && <AuditTrail />}
+        {view === 'proof' && <SystemProof onToast={setToast} />}
       </section>
 
       {selectedCase && <CaseDrawer item={selectedCase} onClose={() => setSelectedCase(null)} onToast={setToast} />}
@@ -195,7 +200,7 @@ function CommandCenter({ onReview, onSelectCase, onViewAudit, onViewQueue }: { o
     <div className="view-stack">
       <section className="briefing">
         <div className="agent-orb"><Bot size={20} /></div>
-        <div><p>RECOVERY BRIEFING · 09:42</p><h2>Good morning. I found <em>₹1.72L</em> at risk today.</h2><span>68 failed renewals are recoverable. I’ve safely queued 51 and held 17 for review.</span></div>
+        <div><p>SIMULATED RECOVERY BRIEFING · LIVE ENGINE</p><h2>Good morning. I found <em>₹1.72L</em> at risk today.</h2><span>68 representative renewals are recoverable. I’ve safely queued 51 and held 17 for review.</span></div>
         <div className="briefing-tags"><span>14 issuer holds</span><span>6 approvals</span></div>
         <button className="primary-action" onClick={onReview}>Review agent plan <ArrowUpRight size={16} /></button>
       </section>
