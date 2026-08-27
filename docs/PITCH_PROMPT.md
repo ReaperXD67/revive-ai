@@ -44,7 +44,7 @@ TRUTHFULNESS RULES
 - State clearly once that all dashboard customers, amounts and uplift metrics are realistic simulated demo data.
 - Do not claim real merchant deployment, real payments, real customer messages or production revenue.
 - Phrase the “up to 10%” statement as a figure from Razorpay’s 2026 SaaS guide, not as Revive’s result.
-- Distinguish implemented prototype features from production architecture/roadmap. Implemented: public Vercel full-stack deployment, strict decision API, HMAC webhook boundary, private immutable audit persistence, storage-enforced duplicate suppression, security headers, health endpoint and automated tests. Roadmap: merchant authentication, real payment adapters, transactional outbox, scheduled workers and production monitoring.
+- Distinguish implemented prototype features from production architecture/roadmap. Implemented: public Vercel full-stack deployment, strict decision API, HMAC webhook boundary, private immutable audit persistence, storage-enforced duplicate suppression, a live System Proof endpoint, an interactive replay challenge, a policy-boundary Decision Lab, security headers, health endpoint and 16 automated tests. Roadmap: merchant authentication, real payment adapters, transactional outbox, scheduled workers and production monitoring.
 - Never show raw keys, secrets, customer PII, card data, UPI PINs or private browser chrome.
 
 NARRATIVE ARC AND SHOT LIST
@@ -91,11 +91,11 @@ Voiceover: “Most recovery dashboards take credit for every payment that eventu
 Visual: open Audit trail. Track across decision ID, agent, action, policy result, confidence and proof hash. Finish on the four-step Decision Anatomy flow and Trust Guarantee card.
 Voiceover: “Every implemented decision stores its event, customer, amount, action, confidence, mode and schedule behind a unique database constraint. The signed Razorpay webhook route verifies HMAC over untouched bytes and blocks duplicate event IDs. The broader evidence ledger and out-of-order outcome reconciliation shown here are the production target state.”
 
-04:18–04:42 — Architecture and Razorpay fit
-Visual: briefly show the live `/api/health` response with both checks operational, then switch to a clean system diagram: Razorpay webhooks → signature and immutable-idempotency gateway → recovery orchestrator → policy engine → Razorpay retry, hosted update or Payment Link → outcome webhook → experiment and audit ledgers. Mark “implemented” around the hosted API, verifier, private audit store and policy engine; mark adapters/outbox as “pilot roadmap.” Use official product words only as small integration labels, not logos.
-Voiceover: “The public backend is live: the health endpoint confirms both the deterministic engine and private immutable audit store. Revive already authenticates Razorpay-shaped webhook bytes and suppresses duplicates. A real merchant pilot would next add test-mode action adapters, a transactional outbox, per-subscription locking, tenant authorization and operational monitoring.”
+04:18–04:44 — System Proof and architecture
+Visual: click the “Backend live” pill and enter System Proof. Hold on the live deployment region `sin1`, current commit, Vercel Functions runtime and private-record count. Click “Prove duplicate safety”; wait until request one says `stored` and the identical replay says `duplicate suppressed`. In Decision Lab, keep ₹47,999 and click “Run live decision”; highlight `SEND PAYMENT LINK`, `approval required`, the failed high-value check and the new audit proof. End with a two-second cut to `/api/proof` and a compact architecture strip: signed event → policy engine → private immutable record. Never reveal environment variables or raw records.
+Voiceover: “And this is not a decorative architecture slide. System Proof reads the running Vercel commit, region, function runtime, enforced controls and bounded evidence from private storage. The replay challenge sends one event twice: the first write is stored, the second is suppressed by storage. Decision Lab lets a reviewer push policy boundaries live—this forty-seven-thousand-rupee action requires approval. The backend is hosted and independently inspectable; real execution adapters and a transactional outbox remain explicit pilot work.”
 
-04:42–05:00 — Close
+04:44–05:00 — Close
 Visual: return to the command center, then clean brand end card using public/og.png. Add GitHub URL and final product URL. Lime recovery path completes into an upward arrow.
 On-screen text: “Recover revenue. Retain trust.” then “Revive — Autonomous revenue recovery.”
 Voiceover: “Revive turns payment failure from a dead-end status into an explainable, measurable recovery operation. More revenue, less customer friction, and autonomy a fintech team can actually trust. This is Revive.”
@@ -104,11 +104,11 @@ SCREEN CAPTURE INSTRUCTIONS
 1. Use a fresh 1440×900 or 1920×1080 browser viewport at 100% zoom.
 2. Hide bookmarks, extensions, personal tabs and notifications.
 3. Begin on Command center with the browser already loaded.
-4. Record these clean takes separately: Command center; Recovery queue to Nisha case; Run live demo complete; Agent playbooks; Experiments; Audit trail.
+4. Record these clean takes separately: Command center; Recovery queue to Nisha case; Run live demo complete; Agent playbooks; Experiments; Audit trail; System Proof at the top; replay challenge completed; Decision Lab approval result.
 5. Pause for 1.5 seconds after every navigation or drawer open so edits have handles.
 6. Keep the pointer away from text unless actively selecting something.
 7. Do not capture development-console warnings or localhost chrome; crop to product viewport.
-8. Capture one two-second proof shot of https://revive-revenue.vercel.app/api/health with `operational` and `Vercel Blob (private, immutable records)` visible; do not expose environment configuration.
+8. Capture one two-second proof shot of https://revive-revenue.vercel.app/api/proof with `operational`, `sin1`, `Vercel Functions`, four enforced controls and bounded proof hashes visible; do not expose environment configuration or raw audit records.
 
 EDITING RULES
 - Use straight cuts for product actions; use short lime path wipes only between conceptual chapters.
@@ -131,6 +131,7 @@ DELIVERABLES
 - Deploy the latest `main` branch before capturing.
 - Confirm access to `https://revive-revenue.vercel.app` before recording.
 - Open every view once to warm assets before recording.
+- Run System Proof once and confirm the sequence is `stored → duplicate_suppressed` before recording the clean take.
 - Reset the live demo by closing and reopening its modal.
 - Confirm the visible demo amount is ₹11,999.
 - Keep the disclaimer that metrics and customer data are simulated.

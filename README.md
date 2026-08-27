@@ -4,14 +4,14 @@
 
 [![Live demo](https://img.shields.io/badge/live-Vercel-d8ff4f?style=flat-square&labelColor=17201d)](https://revive-revenue.vercel.app)
 [![CI](https://img.shields.io/github/actions/workflow/status/ReaperXD67/revive-ai/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/ReaperXD67/revive-ai/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-14_passing-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
-[![Coverage](https://img.shields.io/badge/core_coverage-95.24%25-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
+[![Tests](https://img.shields.io/badge/tests-16_passing-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
+[![Coverage](https://img.shields.io/badge/core_coverage-95.75%25-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
 [![Production audit](https://img.shields.io/badge/prod_dependencies-0_vulnerabilities-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
 [![License](https://img.shields.io/badge/license-MIT-3178c6?style=flat-square)](LICENSE)
 
 [![Revive revenue command center](docs/assets/revive-command-center.png)](https://revive-revenue.vercel.app)
 
-> [Open the public product](https://revive-revenue.vercel.app) · [Check the hosted backend](https://revive-revenue.vercel.app/api/health) · [Read the API contract](docs/openapi.yaml) · [Use the five-minute pitch prompt](docs/PITCH_PROMPT.md)
+> [Open the public product](https://revive-revenue.vercel.app) · [Challenge the live backend](https://revive-revenue.vercel.app/api/proof) · [Check service health](https://revive-revenue.vercel.app/api/health) · [Read the API contract](docs/openapi.yaml) · [Use the five-minute pitch prompt](docs/PITCH_PROMPT.md)
 
 ## The one-minute pitch
 
@@ -31,13 +31,13 @@ This is an independent Razorpay AI Buildathon prototype for **Track 3: AI Revenu
 
 | Layer | Implemented proof |
 | --- | --- |
-| Product | Responsive command center, ranked recovery queue, explainable case drawer, agent playbooks, experiment analysis, audit trail, and a live modal flow |
+| Product | Responsive command center, ranked recovery queue, explainable case drawer, agent playbooks, experiment analysis, audit trail, live modal flow, System Proof, replay challenge, and interactive Decision Lab |
 | Decision engine | Failure-aware action routing, confidence, approval/block modes, consent/contact/value/AFA gates, issuer holds, IST quiet-hour scheduling, evidence, and deterministic idempotency keys |
-| Hosted API | Strict runtime schema validation, byte-size limits, safe errors, no-store responses, request proof IDs, and an OpenAPI 3.1 contract |
+| Hosted API | Strict runtime schema validation, byte-size limits, safe errors, no-store responses, request proof IDs, a safe live evidence endpoint, and an OpenAPI 3.1 contract |
 | Webhook boundary | Raw-body HMAC-SHA256 verification, secret fail-closed behavior, event-ID requirement, payload hash, and invalid-signature rejection |
 | Persistence | Private Vercel Blob audit records, deterministic SHA-256 object paths, immutable writes, and storage-enforced duplicate suppression |
 | Security | CSP, clickjacking/MIME/referrer/permissions/HSTS headers, no client secrets, bounded public work, dependency audit, and an explicit residual-risk register |
-| Quality | 14 tests, 95.24% line coverage on the core tested modules, lint, production build, GitHub Actions, and Dependabot |
+| Quality | 16 tests, 95.75% line coverage on the core tested modules, lint, production build, GitHub Actions, and Dependabot |
 | Deployment | Public full-stack Vercel deployment; native Next.js frontend, route handlers, encrypted secrets, and private Blob storage are hosted together |
 
 All customers, amounts, uplift metrics, and payment outcomes visible in the UI are realistic fictional demo data. The product does not initiate a real charge or send a real customer message.
@@ -46,13 +46,19 @@ All customers, amounts, uplift metrics, and payment outcomes visible in the UI a
 
 Use this path to see the strongest engineering story in under 90 seconds:
 
-1. Open the [command center](https://revive-revenue.vercel.app) and scan revenue-at-risk, uplift, safe-autonomy, and live-agent activity.
-2. Select **Review agent plan** to see which actions can run autonomously and which require approval.
-3. Open a priority case to inspect evidence, confidence, policy version, context, and the human override.
-4. Select **Run live demo**, then **Start simulation**. The browser calls the hosted API; success is impossible unless a real response returns a plan.
-5. Inspect policy version, immutable audit status, confidence, execution mode, and request proof in the success panel.
-6. Visit **Experiments** for treatment-versus-holdout measurement and **Audit trail** for explainability/proof.
-7. Open [`/api/health`](https://revive-revenue.vercel.app/api/health) to verify the decision engine and durable store independently of the UI.
+1. Open the [command center](https://revive-revenue.vercel.app) and use **Backend live** to enter **System proof**.
+2. Run **Prove duplicate safety**. Two identical production requests must resolve to `stored → duplicate_suppressed`, backed by one immutable private record.
+3. In **Decision Lab**, try ₹47,999 to force approval, set two contacts to trigger a block, or disable issuer health to force a protective hold.
+4. Return to the command center and scan revenue-at-risk, uplift, safe-autonomy, and live-agent activity.
+5. Select **Review agent plan** to see which actions can run autonomously and which require approval.
+6. Open a priority case to inspect evidence, confidence, policy version, context, and the human override.
+7. Select **Run live demo**, then **Start simulation**. The browser calls the hosted API; success is impossible unless a real response returns a plan.
+8. Visit **Experiments** for treatment-versus-holdout measurement and **Audit trail** for explainability/proof.
+9. Open [`/api/proof`](https://revive-revenue.vercel.app/api/proof) to inspect the deployed commit, region, runtime controls, endpoint inventory, and bounded private-store evidence independently of the UI.
+
+[![Revive live System Proof](docs/assets/revive-system-proof-live.jpg)](https://revive-revenue.vercel.app)
+
+![Revive live duplicate-suppression challenge and Decision Lab](docs/assets/revive-live-challenge.jpg)
 
 ![Revive verified live simulation](docs/assets/revive-live-demo.png)
 
@@ -86,6 +92,7 @@ The checked-in slice implements the shaded center of this design: authenticated 
 | Endpoint | Purpose | Important behavior |
 | --- | --- | --- |
 | `GET /api/health` | Operational proof | Reports decision-engine and private-storage state; returns 503 when persistence is degraded |
+| `GET /api/proof` | Safe system evidence | Reports deployed commit/region/runtime, enforced controls, API inventory, and bounded hashes/counts from private storage—never secrets or raw records |
 | `POST /api/recovery/simulate` | Build a recovery plan | Strict JSON schema, 4 KiB limit, policy version, persistence state, proof ID |
 | `POST /api/webhooks/razorpay` | Razorpay-shaped ingestion | Verifies HMAC on untouched bytes, requires event ID, caps 64 KiB, and suppresses duplicates with immutable object keys |
 
@@ -125,14 +132,14 @@ The public-demo verdict and remaining pilot blockers are documented in [`docs/EN
 ## Engineering evidence
 
 ```text
-14 tests passing
-95.24% line coverage
-93.88% branch coverage
+16 tests passing
+95.75% line coverage
+91.23% branch coverage
 100% function coverage
 lint passing
 production build passing
 0 production dependency vulnerabilities
-live health check: operational
+live health and system-proof checks: operational
 live private Blob check: operational
 invalid webhook signature: HTTP 401
 runtime CSP / frame / MIME headers: verified
@@ -159,7 +166,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000` and select **Run live demo**. To exercise persistence locally, link the project with `vercel link`, pull development variables with `vercel env pull`, and inspect `/api/health`.
+Open `http://localhost:3000` and select **Run live demo** or **System proof**. To exercise persistence locally, link the project with `vercel link`, pull development variables with `vercel env pull`, and inspect `/api/health` and `/api/proof`.
 
 ## Deployment
 
@@ -174,6 +181,7 @@ The exact deployment contract and verification evidence are in [`docs/DEPLOYMENT
 | Path | Responsibility |
 | --- | --- |
 | [`app/page.tsx`](app/page.tsx) | Interactive recruiter/demo experience and truth-linked API success state |
+| [`app/system-proof.tsx`](app/system-proof.tsx) | Live deployment evidence, duplicate replay challenge, and policy-boundary Decision Lab |
 | [`lib/recovery-engine.ts`](lib/recovery-engine.ts) | Deterministic action and policy engine |
 | [`lib/recovery-input.ts`](lib/recovery-input.ts) | Strict runtime request contract |
 | [`lib/webhook-security.ts`](lib/webhook-security.ts) | HMAC verification and payload hashing |
@@ -181,13 +189,15 @@ The exact deployment contract and verification evidence are in [`docs/DEPLOYMENT
 | [`app/api/recovery/simulate/route.ts`](app/api/recovery/simulate/route.ts) | Hosted simulation decision endpoint |
 | [`app/api/webhooks/razorpay/route.ts`](app/api/webhooks/razorpay/route.ts) | Signed webhook boundary |
 | [`app/api/health/route.ts`](app/api/health/route.ts) | Runtime dependency evidence |
+| [`app/api/proof/route.ts`](app/api/proof/route.ts) | Public-safe proof of deployment, controls, API surface, and durable evidence |
+| [`lib/system-proof.ts`](lib/system-proof.ts) | Sanitized public deployment metadata |
 | [`docs/PITCH_PROMPT.md`](docs/PITCH_PROMPT.md) | Detailed five-minute Obsidian video prompt |
 | [`docs/SUBMISSION.md`](docs/SUBMISSION.md) | Copy-ready buildathon submission |
 | [`docs/ENGINEERING_AUDIT.md`](docs/ENGINEERING_AUDIT.md) | Fixed loopholes and residual production blockers |
 
 ## Resume-ready bullet
 
-Built and publicly shipped an explainable revenue-recovery control plane for Razorpay subscriptions using Next.js 16, React 19, TypeScript, serverless route handlers, raw-body HMAC webhook authentication, immutable storage-enforced idempotency, deterministic fintech guardrails, causal holdout analytics, 14 automated tests, and 95%+ core coverage.
+Built and publicly shipped an explainable revenue-recovery control plane for Razorpay subscriptions using Next.js 16, React 19, TypeScript, Vercel Functions, raw-body HMAC webhook authentication, immutable storage-enforced idempotency, an interactive production replay challenge, deterministic fintech guardrails, causal holdout analytics, 16 automated tests, and 95%+ core coverage.
 
 ## Production path
 

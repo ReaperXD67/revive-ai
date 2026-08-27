@@ -30,6 +30,7 @@ Audit every item below
 8. Verify Blob key derivation, immutable-write conflict handling, private access, retention needs, failure modes, backup/restore assumptions, and record-version evolution.
 9. Review the causal measurement design for sample-ratio mismatch, unstable bucketing, interference, selection bias, peeking, delayed outcomes, and double attribution.
 10. Run lint, tests, coverage, production build, dependency audit, API probes, browser flow tests, console-log checks, keyboard navigation, responsive checks, and runtime security-header inspection.
+11. Attack `/api/proof` specifically: try to make it reflect environment variables, tokens, branch names, PII, raw event data, unbounded Blob listings, internal URLs, stack traces, or stale deployment evidence. Confirm degraded storage fails safely and that the UI never converts a failed proof request into a green status.
 
 Required output
 - Begin with a one-sentence ship/no-ship verdict for (a) public recruiter demo and (b) real merchant pilot.

@@ -41,11 +41,13 @@ Health: excellent proof moment.
 
 ## Highest-impact implementation changes
 
-1. Add a first-class **System proof** surface with live health, backend host, deployment commit, persistence model, API boundaries, and recent immutable record counts.
-2. Add a one-click **idempotency challenge** that sends the same event twice and visibly proves `stored → duplicate_suppressed`.
-3. Add a configurable **Decision lab** so reviewers can change failure reason, payment rail, value, issuer health, consent, and contact pressure, then inspect the resulting policy trace.
-4. Label simulated portfolio metrics at the dashboard level while keeping API/storage proof clearly live.
-5. Give every navigation control an accessible name and active-state semantics.
+1. ✅ Added a first-class **System proof** surface with live health, backend host, deployment commit, persistence model, API boundaries, and recent immutable record counts.
+2. ✅ Added a one-click **idempotency challenge** that sends the same event twice and visibly proves `stored → duplicate_suppressed`.
+3. ✅ Added a configurable **Decision lab** so reviewers can change failure reason, payment rail, value, issuer health, consent, and contact pressure, then inspect the resulting policy trace.
+4. ✅ Labeled simulated portfolio metrics at the dashboard level while keeping API/storage proof clearly live.
+5. ✅ Gave every navigation control an accessible name and active-state semantics.
+
+Implementation evidence: [`revive-system-proof-live.jpg`](assets/revive-system-proof-live.jpg) and [`revive-live-challenge.jpg`](assets/revive-live-challenge.jpg).
 
 ## Evidence limits
 

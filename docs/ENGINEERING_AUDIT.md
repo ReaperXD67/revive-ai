@@ -108,7 +108,7 @@ Scope: public recruiter demo, React client, native Next.js route handlers, decis
 ## Verification evidence
 
 - 14 unit tests passing.
-- 95.24% line coverage, 93.88% branch coverage, 100% function coverage across the core tested modules.
+- 16 tests with 95.75% line coverage, 91.23% branch coverage, and 100% function coverage across the core tested modules.
 - Lint passes.
 - Native Next.js production build passes with three API routes.
 - `npm audit --omit=dev` reports zero vulnerabilities.

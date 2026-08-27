@@ -3,8 +3,12 @@ info:
   title: Revive Recovery API
   version: 1.0.0
   description: Hosted decision, system-proof, health, and Razorpay webhook endpoints for the Revive buildathon prototype.
+  license:
+    name: MIT
+    identifier: MIT
 servers:
   - url: https://revive-revenue.vercel.app
+security: []
 paths:
   /api/health:
     get:
@@ -59,6 +63,8 @@ paths:
     post:
       summary: Authenticate and deduplicate a Razorpay webhook
       operationId: ingestRazorpayWebhook
+      security:
+        - RazorpaySignature: []
       parameters:
         - in: header
           name: x-razorpay-signature
@@ -85,6 +91,12 @@ paths:
         "503":
           description: Secret or durable ingestion is unavailable.
 components:
+  securitySchemes:
+    RazorpaySignature:
+      type: apiKey
+      in: header
+      name: x-razorpay-signature
+      description: HMAC-SHA256 of the untouched raw request body using the merchant webhook secret.
   schemas:
     RecoveryEvent:
       type: object
@@ -150,7 +162,7 @@ components:
       type: object
       required: [status, generatedAt, deployment, backend, controls, evidence, endpoints]
       properties:
-        status: { type: string, enum: [operational] }
+        status: { type: string, enum: [operational, degraded] }
         generatedAt: { type: string, format: date-time }
         deployment:
           type: object
@@ -163,38 +175,38 @@ components:
             runtime: { type: string }
         backend:
           type: object
-          required: [framework, api, persistence, webhookSecurity, idempotency, policyEngine]
+          required: [framework, API, persistence, webhookBoundary, idempotency, policyVersion]
           properties:
             framework: { type: string }
-            api: { type: string }
+            API: { type: string }
             persistence: { type: string }
-            webhookSecurity: { type: string }
+            webhookBoundary: { type: string }
             idempotency: { type: string }
-            policyEngine: { type: string }
+            policyVersion: { type: string }
         controls:
           type: array
           items:
             type: object
-            required: [name, status, detail]
+            required: [id, label, state]
             properties:
-              name: { type: string }
-              status: { type: string, enum: [active] }
-              detail: { type: string }
+              id: { type: string }
+              label: { type: string }
+              state: { type: string, enum: [enforced] }
         evidence:
           type: object
-          required: [store, visibility, decisionRecordsObserved, webhookEventsObserved, latestProofs]
+          required: [decisionRecordsObserved, webhookRecordsObserved, resultWindow, hasMoreDecisions, hasMoreWebhooks, latestProofs]
           properties:
-            store: { type: string }
-            visibility: { type: string }
             decisionRecordsObserved: { type: integer, minimum: 0 }
-            webhookEventsObserved: { type: integer, minimum: 0 }
+            webhookRecordsObserved: { type: integer, minimum: 0 }
+            resultWindow: { type: integer, minimum: 1 }
+            hasMoreDecisions: { type: boolean }
+            hasMoreWebhooks: { type: boolean }
             latestProofs:
               type: array
               items:
                 type: object
-                required: [kind, proofHash, recordedAt, sizeBytes]
+                required: [proofHash, recordedAt, sizeBytes]
                 properties:
-                  kind: { type: string, enum: [decision, webhook] }
                   proofHash: { type: string }
                   recordedAt: { type: string, format: date-time }
                   sizeBytes: { type: integer, minimum: 0 }

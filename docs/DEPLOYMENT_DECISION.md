@@ -6,6 +6,7 @@ Revive is deployed as one native Next.js application on Vercel:
 
 - Product: https://revive-revenue.vercel.app
 - Health: https://revive-revenue.vercel.app/api/health
+- System proof: https://revive-revenue.vercel.app/api/proof
 - Decision API: `POST /api/recovery/simulate`
 - Razorpay-shaped webhook: `POST /api/webhooks/razorpay`
 - Durable audit store: private Vercel Blob in `sin1`
@@ -26,13 +27,15 @@ The production smoke test checks:
 - homepage returns HTTP 200;
 - CSP and defensive response headers are present;
 - `/api/health` reports the decision engine and private audit store operational;
+- `/api/proof` reports the live Vercel region, runtime, deployed commit, enforced controls, API inventory, and bounded private-store evidence without exposing raw records or secrets;
 - a new recovery decision returns `stored`;
 - the same decision returns `duplicate_suppressed`;
+- the browser-based replay challenge proves the same `stored → duplicate_suppressed` sequence on the production alias;
 - an invalid webhook signature returns HTTP 401.
 
 ## Backend hosting answer
 
-The backend is hosted, but it is intentionally not a separate service. Next.js route handlers run as Vercel Functions and private Blob stores durable proof. A separate worker or queue service becomes justified only when Revive introduces scheduled retries, real payment/message adapters, transactional outbox processing, dead letters, and replay tooling.
+The backend is hosted, but it is intentionally not a separate service. Next.js route handlers run as Vercel Functions in `sin1`, encrypted environment variables keep webhook credentials server-side, and private Vercel Blob in `sin1` stores durable proof. The frontend and functions ship from the same immutable deployment. A separate worker or queue service becomes justified only when Revive introduces scheduled retries, real payment/message adapters, transactional outbox processing, dead letters, and replay tooling.
 
 ## Production-pilot boundary
 
