@@ -13,7 +13,7 @@ PROJECT
 Name: Revive
 Tagline: Autonomous revenue recovery
 Track: Track 3 — AI Revenue Recovery
-Product URL: [DEPLOYED_PRODUCT_URL]
+Product URL: https://revive-ai.plim97527.chatgpt.site
 GitHub URL: https://github.com/ReaperXD67/revive-ai
 
 CORE STORY
@@ -128,7 +128,7 @@ DELIVERABLES
 ## Recording checklist
 
 - Deploy the latest `main` branch before capturing.
-- Replace `[DEPLOYED_PRODUCT_URL]` in the prompt.
+- Confirm access to `https://revive-ai.plim97527.chatgpt.site` before recording.
 - Open every view once to warm assets before recording.
 - Reset the live demo by closing and reopening its modal.
 - Confirm the visible demo amount is ₹11,999.
