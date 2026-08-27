@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Revive Recovery API
   version: 1.0.0
-  description: Hosted decision, health, and Razorpay webhook endpoints for the Revive buildathon prototype.
+  description: Hosted decision, system-proof, health, and Razorpay webhook endpoints for the Revive buildathon prototype.
 servers:
   - url: https://revive-revenue.vercel.app
 paths:
@@ -19,6 +19,19 @@ paths:
                 $ref: "#/components/schemas/Health"
         "503":
           description: The decision engine is available but the durable store is degraded.
+  /api/proof:
+    get:
+      summary: Inspect safe, live evidence of the deployed backend and durable audit store
+      operationId: getSystemProof
+      responses:
+        "200":
+          description: Deployment, control, endpoint, and bounded immutable-storage evidence.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemProof"
+        "503":
+          description: The proof surface could not verify the durable store.
   /api/recovery/simulate:
     post:
       summary: Produce and persist a policy-gated recovery plan
@@ -133,3 +146,64 @@ components:
         version: { type: string }
         checks: { type: object }
         timestamp: { type: string, format: date-time }
+    SystemProof:
+      type: object
+      required: [status, generatedAt, deployment, backend, controls, evidence, endpoints]
+      properties:
+        status: { type: string, enum: [operational] }
+        generatedAt: { type: string, format: date-time }
+        deployment:
+          type: object
+          required: [platform, compute, region, commit, runtime]
+          properties:
+            platform: { type: string }
+            compute: { type: string }
+            region: { type: string }
+            commit: { type: string }
+            runtime: { type: string }
+        backend:
+          type: object
+          required: [framework, api, persistence, webhookSecurity, idempotency, policyEngine]
+          properties:
+            framework: { type: string }
+            api: { type: string }
+            persistence: { type: string }
+            webhookSecurity: { type: string }
+            idempotency: { type: string }
+            policyEngine: { type: string }
+        controls:
+          type: array
+          items:
+            type: object
+            required: [name, status, detail]
+            properties:
+              name: { type: string }
+              status: { type: string, enum: [active] }
+              detail: { type: string }
+        evidence:
+          type: object
+          required: [store, visibility, decisionRecordsObserved, webhookEventsObserved, latestProofs]
+          properties:
+            store: { type: string }
+            visibility: { type: string }
+            decisionRecordsObserved: { type: integer, minimum: 0 }
+            webhookEventsObserved: { type: integer, minimum: 0 }
+            latestProofs:
+              type: array
+              items:
+                type: object
+                required: [kind, proofHash, recordedAt, sizeBytes]
+                properties:
+                  kind: { type: string, enum: [decision, webhook] }
+                  proofHash: { type: string }
+                  recordedAt: { type: string, format: date-time }
+                  sizeBytes: { type: integer, minimum: 0 }
+        endpoints:
+          type: array
+          items:
+            type: object
+            required: [method, path, purpose]
+            properties:
+              method: { type: string }
+              path: { type: string }
+              purpose: { type: string }

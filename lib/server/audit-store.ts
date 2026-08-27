@@ -82,6 +82,32 @@ export async function databaseHealth() {
   }
 }
 
+export async function auditEvidence() {
+  const token = blobToken();
+  const [decisionResult, webhookResult] = await Promise.all([
+    list({ prefix: 'recovery-decisions/', limit: 100, token }),
+    list({ prefix: 'webhook-events/', limit: 100, token }),
+  ]);
+
+  const latestProofs = decisionResult.blobs
+    .toSorted((left, right) => right.uploadedAt.getTime() - left.uploadedAt.getTime())
+    .slice(0, 5)
+    .map((blob) => ({
+      proofHash: blob.pathname.split('/').at(-1)?.replace(/\.json$/, '').slice(0, 12) ?? 'unavailable',
+      recordedAt: blob.uploadedAt.toISOString(),
+      sizeBytes: blob.size,
+    }));
+
+  return {
+    decisionRecordsObserved: decisionResult.blobs.length,
+    webhookRecordsObserved: webhookResult.blobs.length,
+    resultWindow: 100,
+    hasMoreDecisions: decisionResult.hasMore,
+    hasMoreWebhooks: webhookResult.hasMore,
+    latestProofs,
+  };
+}
+
 export function webhookSecret() {
   return process.env.RAZORPAY_WEBHOOK_SECRET;
 }
