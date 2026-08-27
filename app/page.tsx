@@ -13,6 +13,7 @@ import {
   agentActions, auditEvents, baselineBars, chartBars, playbooks,
   recoveryCases, researchFacts, type NavView, type RecoveryCase,
 } from './data';
+import type { RecoveryPlan } from '../lib/recovery-engine';
 
 const navItems = [
   { id: 'command' as NavView, label: 'Command center', icon: Command },
@@ -32,6 +33,13 @@ const viewMeta: Record<NavView, { eyebrow: string; title: string; description: s
 
 const formatMoney = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
 
+type SimulationResponse = {
+  requestId: string;
+  policyVersion: string;
+  persistence: 'stored' | 'duplicate_suppressed' | 'degraded';
+  plan: RecoveryPlan;
+};
+
 export default function Home() {
   const [view, setView] = useState<NavView>('command');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -40,6 +48,8 @@ export default function Home() {
   const [demoOpen, setDemoOpen] = useState(false);
   const [demoStep, setDemoStep] = useState(0);
   const [running, setRunning] = useState(false);
+  const [demoResult, setDemoResult] = useState<SimulationResponse | null>(null);
+  const [demoError, setDemoError] = useState('');
   const [toast, setToast] = useState('');
   const [query, setQuery] = useState('');
   const [queueFilter, setQueueFilter] = useState('All cases');
@@ -54,22 +64,36 @@ export default function Home() {
   useEffect(() => {
     if (!running) return;
     const timer = window.setTimeout(() => {
-      if (demoStep >= 3) {
+      if (demoStep >= 3 && demoResult) {
         setDemoStep(4);
         setRunning(false);
-        setToast('₹11,999 recovered. The subscription is active again.');
+        setToast('Simulation verified: decision stored and recovery completed safely.');
+      } else if (demoStep >= 3) {
+        return;
       } else {
         setDemoStep((step) => step + 1);
       }
     }, 900);
     return () => window.clearTimeout(timer);
-  }, [running, demoStep]);
+  }, [running, demoStep, demoResult]);
 
   useEffect(() => {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(''), 4200);
     return () => window.clearTimeout(timer);
   }, [toast]);
+
+  useEffect(() => {
+    const closeOverlay = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setSelectedCase(null);
+      setPlanOpen(false);
+      setDemoOpen(false);
+      setRunning(false);
+    };
+    window.addEventListener('keydown', closeOverlay);
+    return () => window.removeEventListener('keydown', closeOverlay);
+  }, []);
 
   const chooseView = (next: NavView) => {
     setView(next);
@@ -79,21 +103,34 @@ export default function Home() {
 
   const startDemo = async () => {
     setDemoStep(0);
+    setDemoResult(null);
+    setDemoError('');
     setRunning(true);
     try {
-      await fetch('/api/recovery/simulate', {
+      const response = await fetch('/api/recovery/simulate', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          eventId: 'evt_demo_4821', customerId: 'cust_demo_nisha', amount: 11999,
+          eventId: `evt_demo_${crypto.randomUUID()}`, customerId: 'cust_demo_nisha', amount: 11999,
           failureReason: 'insufficient_balance', rail: 'upi_autopay',
           occurredAt: '2026-08-27T09:42:00.000Z', contactsLast72Hours: 0,
           hasMessagingConsent: true, issuerHealthy: true, lifetimeValue: 148200,
         }),
       });
-    } catch {
-      // The visual simulation remains available if the local API is offline.
+      const payload = await response.json() as SimulationResponse & { error?: string };
+      if (!response.ok || !payload.plan) throw new Error(payload.error ?? 'The recovery API rejected the simulation.');
+      setDemoResult(payload);
+    } catch (error) {
+      setRunning(false);
+      setDemoError(error instanceof Error ? error.message : 'The recovery API is unavailable.');
     }
+  };
+
+  const openDemo = () => {
+    setDemoStep(0);
+    setDemoResult(null);
+    setDemoError('');
+    setDemoOpen(true);
   };
 
   return (
@@ -131,14 +168,14 @@ export default function Home() {
         <header className="topbar">
           <div><p className="eyebrow">{meta.eyebrow}</p><h1>{meta.title}</h1><span className="view-description">{meta.description}</span></div>
           <div className="topbar-actions">
-            <label className="global-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search customers" aria-label="Search customers" /><kbd>⌘ K</kbd></label>
+            <label className="global-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && query.trim()) chooseView('queue'); }} placeholder="Search customers" aria-label="Search customers" /><kbd>↵</kbd></label>
             <button className="icon-button" aria-label="Notifications"><Bell size={17} /><i /></button>
-            <button className="demo-button" onClick={() => setDemoOpen(true)}><Play size={14} fill="currentColor" /> Run live demo</button>
+            <button className="demo-button" onClick={openDemo}><Play size={14} fill="currentColor" /> Run live demo</button>
             <button className="avatar" aria-label="Open account menu">AK</button>
           </div>
         </header>
 
-        {view === 'command' && <CommandCenter onReview={() => setPlanOpen(true)} onSelectCase={setSelectedCase} />}
+        {view === 'command' && <CommandCenter onReview={() => setPlanOpen(true)} onSelectCase={setSelectedCase} onViewAudit={() => chooseView('audit')} onViewQueue={() => chooseView('queue')} />}
         {view === 'queue' && <RecoveryQueue cases={visibleCases} filter={queueFilter} onFilter={setQueueFilter} onSelectCase={setSelectedCase} />}
         {view === 'playbooks' && <Playbooks onToast={setToast} />}
         {view === 'experiments' && <Experiments />}
@@ -147,13 +184,13 @@ export default function Home() {
 
       {selectedCase && <CaseDrawer item={selectedCase} onClose={() => setSelectedCase(null)} onToast={setToast} />}
       {planOpen && <PlanDrawer onClose={() => setPlanOpen(false)} onSelectCase={(item) => { setPlanOpen(false); setSelectedCase(item); }} onToast={setToast} />}
-      {demoOpen && <DemoModal step={demoStep} running={running} onStart={startDemo} onClose={() => { setDemoOpen(false); setRunning(false); }} />}
+      {demoOpen && <DemoModal step={demoStep} running={running} result={demoResult} error={demoError} onStart={startDemo} onClose={() => { setDemoOpen(false); setRunning(false); }} />}
       {toast && <div className="toast" role="status"><CheckCircle2 size={18} /><span>{toast}</span><button onClick={() => setToast('')} aria-label="Dismiss"><X size={15} /></button></div>}
     </main>
   );
 }
 
-function CommandCenter({ onReview, onSelectCase }: { onReview: () => void; onSelectCase: (item: RecoveryCase) => void }) {
+function CommandCenter({ onReview, onSelectCase, onViewAudit, onViewQueue }: { onReview: () => void; onSelectCase: (item: RecoveryCase) => void; onViewAudit: () => void; onViewQueue: () => void }) {
   return (
     <div className="view-stack">
       <section className="briefing">
@@ -184,12 +221,12 @@ function CommandCenter({ onReview, onSelectCase }: { onReview: () => void; onSel
         <section className="panel action-feed">
           <div className="panel-heading"><div><p className="eyebrow">AGENT ACTIVITY</p><h2>What Revive is doing</h2></div><span className="live-indicator"><i /> LIVE</span></div>
           <div className="activity-list">{agentActions.map((action) => <div className="activity-row" key={action.time}><span className={`activity-icon ${action.tone}`}><Zap size={14} /></span><div><strong>{action.title}</strong><span>{action.detail}</span></div><time>{action.time}</time></div>)}</div>
-          <button className="text-button">View full audit trail <ArrowRight size={14} /></button>
+          <button className="text-button" onClick={onViewAudit}>View full audit trail <ArrowRight size={14} /></button>
         </section>
       </div>
 
       <section className="panel priority-panel">
-        <div className="panel-heading"><div><p className="eyebrow">PRIORITY QUEUE</p><h2>Highest-value recovery opportunities</h2></div><button className="text-button">View all 68 cases <ArrowRight size={14} /></button></div>
+        <div className="panel-heading"><div><p className="eyebrow">PRIORITY QUEUE</p><h2>Highest-value recovery opportunities</h2></div><button className="text-button" onClick={onViewQueue}>View all 68 cases <ArrowRight size={14} /></button></div>
         <div className="case-list compact">{recoveryCases.slice(0, 4).map((item) => <CaseRow item={item} key={item.id} onClick={() => onSelectCase(item)} />)}</div>
       </section>
     </div>
@@ -266,7 +303,7 @@ function PlanDrawer({ onClose, onSelectCase, onToast }: { onClose: () => void; o
   return <div className="overlay drawer-overlay" role="dialog" aria-modal="true" aria-label="Agent plan review"><button className="overlay-dismiss" onClick={onClose} aria-label="Close agent plan" /><aside className="case-drawer plan-drawer"><div className="drawer-header"><div><p className="eyebrow">DAILY PLAN · 27 AUGUST</p><h2>51 actions ready. 6 need you.</h2></div><button onClick={onClose} aria-label="Close"><X size={18} /></button></div><div className="plan-summary"><span><strong>₹1.72L</strong><small>total at risk</small></span><ArrowRight size={17} /><span><strong>₹1.09L</strong><small>expected recovery</small></span><ArrowRight size={17} /><span><strong>63.4%</strong><small>forecast rate</small></span></div><section className="drawer-section"><div className="section-heading-row"><div><p className="eyebrow">SAFE AUTONOMY</p><h3>Already queued</h3></div><span className="version-pill">51 actions</span></div>{[['Balance-aware retries', '23 actions', '₹58,420'], ['Issuer health holds', '14 actions', '₹31,860'], ['Secure method updates', '8 actions', '₹20,600'], ['Soft-touch reminders', '6 actions', '₹12,240']].map((row) => <div className="plan-row" key={row[0]}><span><CheckCircle2 size={15} /><strong>{row[0]}</strong></span><small>{row[1]}</small><strong>{row[2]}</strong></div>)}</section><section className="drawer-section"><div className="section-heading-row"><div><p className="eyebrow">HUMAN CHECKPOINT</p><h3>Needs approval</h3></div><span className="review-count">6</span></div>{reviewCases.map((item) => <button className="review-row" key={item.id} onClick={() => onSelectCase(item)}><span className="customer-cell"><i style={{ background: item.accent }}>{item.initials}</i><span><strong>{item.customer}</strong><small>{item.failure}</small></span></span><strong>{formatMoney(item.amount)}</strong><ChevronRight size={15} /></button>)}</section><div className="policy-banner"><ShieldCheck size={18} /><p><strong>Your guardrails are active</strong><span>No customer will be contacted more than twice in 72 hours. Accounts over ₹40,000 require approval.</span></p></div><div className="drawer-actions"><button className="outline-action" onClick={onClose}>Review later</button><button className="primary-dark" onClick={() => { onToast('Daily plan approved. 51 safe actions are now executing.'); onClose(); }}><Zap size={15} /> Approve safe actions</button></div></aside></div>;
 }
 
-function DemoModal({ step, running, onStart, onClose }: { step: number; running: boolean; onStart: () => void; onClose: () => void }) {
+function DemoModal({ step, running, result, error, onStart, onClose }: { step: number; running: boolean; result: SimulationResponse | null; error: string; onStart: () => void; onClose: () => void }) {
   const steps = [{ icon: Webhook, title: 'Ingest failure', detail: 'Verify signature and deduplicate event' }, { icon: Sparkles, title: 'Reason over context', detail: 'Classify cause and score recovery paths' }, { icon: ShieldCheck, title: 'Apply guardrails', detail: 'Check trust, value and contact policies' }, { icon: Zap, title: 'Execute recovery', detail: 'Retry at predicted salary window' }];
-  return <div className="overlay modal-overlay" role="dialog" aria-modal="true" aria-label="Live recovery demo"><button className="overlay-dismiss" onClick={onClose} aria-label="Close live demo" /><section className="demo-modal"><div className="drawer-header"><div><p className="eyebrow">INTERACTIVE RECOVERY SIMULATION</p><h2>Watch ₹11,999 come back.</h2></div><button onClick={onClose} aria-label="Close"><X size={18} /></button></div><p className="demo-intro">A realistic Razorpay <code>subscription.pending</code> event enters Revive. Every decision is explainable, policy-checked and duplicate-safe.</p><div className="incoming-event"><span className="event-icon"><RadioTower size={17} /></span><div><small>INCOMING WEBHOOK</small><strong>Nisha Menon · Pro annual</strong><span>Insufficient balance · UPI AutoPay</span></div><strong>₹11,999</strong></div><div className="demo-steps">{steps.map(({ icon: Icon, title, detail }, index) => { const complete = step > index; const active = running && step === index; return <div className={`demo-step ${complete ? 'complete' : ''} ${active ? 'active' : ''}`} key={title}><span>{complete ? <Check size={16} /> : <Icon size={16} />}</span><p><strong>{title}</strong><small>{detail}</small></p><i>{complete ? 'Done' : active ? 'Working…' : 'Waiting'}</i></div>; })}</div>{step >= 4 ? <div className="demo-success"><div><CheckCircle2 size={24} /></div><p><small>PAYMENT CAPTURED</small><strong>₹11,999 recovered</strong><span>Subscription restored · customer retained · event logged</span></p></div> : <div className="demo-controls"><div><ShieldCheck size={15} /><span>Simulation mode · no real payment or message will be sent</span></div><button className="primary-dark" onClick={onStart} disabled={running}><Play size={14} fill="currentColor" />{running ? 'Agents working…' : step ? 'Restart simulation' : 'Start simulation'}</button></div>}<details className="demo-research"><summary>Why this simulation is realistic <ChevronDown size={14} /></summary>{researchFacts.map((fact) => <p key={fact}><Check size={13} />{fact}</p>)}</details></section></div>;
+  return <div className="overlay modal-overlay" role="dialog" aria-modal="true" aria-label="Live recovery demo"><button className="overlay-dismiss" onClick={onClose} aria-label="Close live demo" /><section className="demo-modal"><div className="drawer-header"><div><p className="eyebrow">INTERACTIVE RECOVERY SIMULATION</p><h2>Watch ₹11,999 come back.</h2></div><button onClick={onClose} aria-label="Close"><X size={18} /></button></div><p className="demo-intro">A realistic Razorpay <code>subscription.pending</code> event enters the hosted decision API. Every response is runtime-validated, policy-checked, idempotent and stored in a durable audit trail.</p><div className="incoming-event"><span className="event-icon"><RadioTower size={17} /></span><div><small>INCOMING WEBHOOK</small><strong>Nisha Menon · Pro annual</strong><span>Insufficient balance · UPI AutoPay</span></div><strong>₹11,999</strong></div><div className="demo-steps">{steps.map(({ icon: Icon, title, detail }, index) => { const complete = step > index; const active = running && step === index; return <div className={`demo-step ${complete ? 'complete' : ''} ${active ? 'active' : ''}`} key={title}><span>{complete ? <Check size={16} /> : <Icon size={16} />}</span><p><strong>{title}</strong><small>{detail}</small></p><i>{complete ? 'Done' : active ? 'Working…' : 'Waiting'}</i></div>; })}</div>{step >= 4 && result ? <><div className="demo-success"><div><CheckCircle2 size={24} /></div><p><small>SIMULATED PAYMENT CAPTURED</small><strong>₹11,999 recovered</strong><span>{result.plan.action.replaceAll('_', ' ')} · {Math.round(result.plan.confidence * 100)}% confidence · {result.plan.executionMode}</span></p></div><div className="demo-proof"><span><small>POLICY</small><strong>v{result.policyVersion}</strong></span><span><small>AUDIT STORE</small><strong>{result.persistence.replaceAll('_', ' ')}</strong></span><span><small>REQUEST PROOF</small><strong>{result.requestId.slice(0, 8)}…</strong></span></div></> : <div className="demo-controls"><div><ShieldCheck size={15} /><span>Simulation mode · no real payment or message will be sent</span></div><button className="primary-dark" onClick={onStart} disabled={running}><Play size={14} fill="currentColor" />{running ? 'Agents working…' : step ? 'Restart simulation' : 'Start simulation'}</button></div>}{error ? <div className="demo-error" role="alert"><CircleAlert size={15} /><span>{error} No recovery was claimed.</span></div> : null}<details className="demo-research"><summary>Why this simulation is realistic <ChevronDown size={14} /></summary>{researchFacts.map((fact) => <p key={fact}><Check size={13} />{fact}</p>)}</details></section></div>;
 }

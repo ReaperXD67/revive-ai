@@ -27,6 +27,8 @@ export type RecoveryPolicy = {
   maximumContactsPer72Hours: number;
   quietHoursStart: number;
   quietHoursEnd: number;
+  timeZone: 'Asia/Kolkata';
+  timeZoneOffsetMinutes: number;
   upiAutopayAfaThreshold: number;
 };
 
@@ -54,6 +56,8 @@ export const defaultPolicy: RecoveryPolicy = {
   maximumContactsPer72Hours: 2,
   quietHoursStart: 21,
   quietHoursEnd: 8,
+  timeZone: 'Asia/Kolkata',
+  timeZoneOffsetMinutes: 330,
   upiAutopayAfaThreshold: 15_000,
 };
 
@@ -88,13 +92,14 @@ function requiresCustomerContact(action: RecoveryAction) {
 
 function nextSafeExecutionTime(event: RecoveryEvent, policy: RecoveryPolicy) {
   const date = new Date(event.occurredAt);
-  const hour = date.getUTCHours();
+  const localDate = new Date(date.getTime() + policy.timeZoneOffsetMinutes * 60_000);
+  const hour = localDate.getUTCHours();
   const isQuietHours = hour >= policy.quietHoursStart || hour < policy.quietHoursEnd;
   if (!isQuietHours) return date.toISOString();
 
-  date.setUTCDate(date.getUTCDate() + (hour >= policy.quietHoursStart ? 1 : 0));
-  date.setUTCHours(policy.quietHoursEnd, 10, 0, 0);
-  return date.toISOString();
+  localDate.setUTCDate(localDate.getUTCDate() + (hour >= policy.quietHoursStart ? 1 : 0));
+  localDate.setUTCHours(policy.quietHoursEnd, 10, 0, 0);
+  return new Date(localDate.getTime() - policy.timeZoneOffsetMinutes * 60_000).toISOString();
 }
 
 export function planRecovery(event: RecoveryEvent, policy: RecoveryPolicy = defaultPolicy): RecoveryPlan {

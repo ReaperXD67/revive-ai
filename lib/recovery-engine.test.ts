@@ -43,3 +43,13 @@ test('derives a stable idempotency key from the event and action', () => {
   const second = planRecovery(baseEvent);
   assert.equal(first.idempotencyKey, second.idempotencyKey);
 });
+
+test('enforces quiet hours in Asia/Kolkata instead of UTC', () => {
+  const plan = planRecovery({ ...baseEvent, occurredAt: '2026-08-27T17:45:00.000Z' });
+  assert.equal(plan.scheduledFor, '2026-08-28T02:40:00.000Z');
+});
+
+test('schedules after the same-day quiet window when it is early morning IST', () => {
+  const plan = planRecovery({ ...baseEvent, occurredAt: '2026-08-27T01:30:00.000Z' });
+  assert.equal(plan.scheduledFor, '2026-08-27T02:40:00.000Z');
+});
