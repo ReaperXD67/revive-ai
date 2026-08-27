@@ -14,7 +14,7 @@ Revive prevents failed recurring payments from silently becoming lost customers.
 
 Unlike a generic retry scheduler or AI chat wrapper, Revive is built around trustworthy autonomy. Every action is checked against consent, contact-frequency, quiet-hour, UPI AutoPay authentication and high-value approval policies; every decision includes evidence, confidence, an idempotency key and an audit record. A treatment/holdout experiment ledger measures incremental recovered revenue so operators can prove what the AI actually created.
 
-The prototype includes an interactive command center, recovery queue, explainable case view, specialist-agent playbooks, causal experiments, a hosted decision API, raw-body HMAC webhook verification, D1-enforced duplicate suppression/audit persistence, security headers, a public health check, 14 automated tests and a live failure-to-recovery simulation. All demo data is fictional and no real payment is initiated.
+The prototype includes an interactive command center, recovery queue, explainable case view, specialist-agent playbooks, causal experiments, a hosted decision API, raw-body HMAC webhook verification, immutable storage-enforced duplicate suppression/audit persistence, security headers, a public health check, 14 automated tests and a live failure-to-recovery simulation. All demo data is fictional and no real payment is initiated.
 
 ## GitHub Repository URL
 
@@ -34,4 +34,4 @@ Indian subscription businesses can lose valuable customers because a card expire
 
 ## Resume bullet
 
-Built and publicly shipped Revive, an explainable revenue-recovery control plane for Razorpay subscriptions using React 19, TypeScript, edge route handlers, raw-body HMAC webhook authentication, D1-enforced idempotency, deterministic fintech guardrails, causal holdout analytics, 14 tests and 95%+ core coverage.
+Built and publicly shipped Revive, an explainable revenue-recovery control plane for Razorpay subscriptions using Next.js 16, React 19, TypeScript, serverless route handlers, raw-body HMAC webhook authentication, immutable storage-enforced idempotency, deterministic fintech guardrails, causal holdout analytics, 14 tests and 95%+ core coverage.

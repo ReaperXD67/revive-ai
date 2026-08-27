@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: Hosted decision, health, and Razorpay webhook endpoints for the Revive buildathon prototype.
 servers:
-  - url: https://revive-ai.plim97527.chatgpt.site
+  - url: https://revive-revenue.vercel.app
 paths:
   /api/health:
     get:

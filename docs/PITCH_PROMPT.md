@@ -13,7 +13,7 @@ PROJECT
 Name: Revive
 Tagline: Autonomous revenue recovery
 Track: Track 3 — AI Revenue Recovery
-Product URL: https://revive-ai.plim97527.chatgpt.site
+Product URL: https://revive-revenue.vercel.app
 GitHub URL: https://github.com/ReaperXD67/revive-ai
 
 CORE STORY
@@ -44,7 +44,7 @@ TRUTHFULNESS RULES
 - State clearly once that all dashboard customers, amounts and uplift metrics are realistic simulated demo data.
 - Do not claim real merchant deployment, real payments, real customer messages or production revenue.
 - Phrase the “up to 10%” statement as a figure from Razorpay’s 2026 SaaS guide, not as Revive’s result.
-- Distinguish implemented prototype features from production architecture/roadmap. Implemented: public full-stack deployment, strict decision API, HMAC webhook boundary, D1 audit persistence, duplicate constraints, security headers, health endpoint and automated tests. Roadmap: merchant authentication, real payment adapters, transactional outbox, scheduled workers and production monitoring.
+- Distinguish implemented prototype features from production architecture/roadmap. Implemented: public Vercel full-stack deployment, strict decision API, HMAC webhook boundary, private immutable audit persistence, storage-enforced duplicate suppression, security headers, health endpoint and automated tests. Roadmap: merchant authentication, real payment adapters, transactional outbox, scheduled workers and production monitoring.
 - Never show raw keys, secrets, customer PII, card data, UPI PINs or private browser chrome.
 
 NARRATIVE ARC AND SHOT LIST
@@ -76,7 +76,7 @@ Voiceover: “Open any case and Revive explains itself. For this insufficient-ba
 
 02:12–02:45 — Live recovery simulation
 Visual: click Run live demo. Start simulation. Let each of the four stages visibly finish: Ingest failure, Reason over context, Apply guardrails, Execute recovery. Hold on the proof row showing policy v3.4.0, audit store “stored,” and the request ID. End on “₹11,999 recovered.” Synchronize each step with the narration; use one subtle chime on success.
-Voiceover: “Here is the implemented flow end to end. A realistic subscription-pending event enters the hosted simulation API. Revive validates the runtime schema, classifies the failure, scores candidate actions, applies deterministic trust guardrails, stores the decision in D1, and returns an idempotent plan with a request proof ID. The payment capture is simulated, clearly labeled, and the interface refuses to claim success if the API fails.”
+Voiceover: “Here is the implemented flow end to end. A realistic subscription-pending event enters the hosted simulation API. Revive validates the runtime schema, classifies the failure, scores candidate actions, applies deterministic trust guardrails, stores an immutable private audit record, and returns an idempotent plan with a request proof ID. The payment capture is simulated, clearly labeled, and the interface refuses to claim success if the API fails.”
 
 02:45–03:20 — Specialist agents and guardrails
 Visual: close modal, open Agent playbooks. Reveal the multi-agent chain: Event Listener → Recovery Brain → Trust Guardian → Action Agents. Scroll through the four playbooks. Animate a hard red stop at a policy gate, then a lime pass for a safe action.
@@ -92,8 +92,8 @@ Visual: open Audit trail. Track across decision ID, agent, action, policy result
 Voiceover: “Every implemented decision stores its event, customer, amount, action, confidence, mode and schedule behind a unique database constraint. The signed Razorpay webhook route verifies HMAC over untouched bytes and blocks duplicate event IDs. The broader evidence ledger and out-of-order outcome reconciliation shown here are the production target state.”
 
 04:18–04:42 — Architecture and Razorpay fit
-Visual: briefly show the live `/api/health` response with both checks operational, then switch to a clean system diagram: Razorpay webhooks → signature and D1 idempotency gateway → recovery orchestrator → policy engine → Razorpay retry, hosted update or Payment Link → outcome webhook → experiment and audit ledgers. Mark “implemented” around the hosted API, verifier, D1 and policy engine; mark adapters/outbox as “pilot roadmap.” Use official product words only as small integration labels, not logos.
-Voiceover: “The public backend is live: the health endpoint confirms both the deterministic engine and durable D1 store. Revive already authenticates Razorpay-shaped webhook bytes and suppresses duplicates. A real merchant pilot would next add test-mode action adapters, a transactional outbox, per-subscription locking, tenant authorization and operational monitoring.”
+Visual: briefly show the live `/api/health` response with both checks operational, then switch to a clean system diagram: Razorpay webhooks → signature and immutable-idempotency gateway → recovery orchestrator → policy engine → Razorpay retry, hosted update or Payment Link → outcome webhook → experiment and audit ledgers. Mark “implemented” around the hosted API, verifier, private audit store and policy engine; mark adapters/outbox as “pilot roadmap.” Use official product words only as small integration labels, not logos.
+Voiceover: “The public backend is live: the health endpoint confirms both the deterministic engine and private immutable audit store. Revive already authenticates Razorpay-shaped webhook bytes and suppresses duplicates. A real merchant pilot would next add test-mode action adapters, a transactional outbox, per-subscription locking, tenant authorization and operational monitoring.”
 
 04:42–05:00 — Close
 Visual: return to the command center, then clean brand end card using public/og.png. Add GitHub URL and final product URL. Lime recovery path completes into an upward arrow.
@@ -108,7 +108,7 @@ SCREEN CAPTURE INSTRUCTIONS
 5. Pause for 1.5 seconds after every navigation or drawer open so edits have handles.
 6. Keep the pointer away from text unless actively selecting something.
 7. Do not capture development-console warnings or localhost chrome; crop to product viewport.
-8. Capture one two-second proof shot of https://revive-ai.plim97527.chatgpt.site/api/health with `operational` and `Cloudflare D1` visible; do not expose environment configuration.
+8. Capture one two-second proof shot of https://revive-revenue.vercel.app/api/health with `operational` and `Vercel Blob (private, immutable records)` visible; do not expose environment configuration.
 
 EDITING RULES
 - Use straight cuts for product actions; use short lime path wipes only between conceptual chapters.
@@ -129,7 +129,7 @@ DELIVERABLES
 ## Recording checklist
 
 - Deploy the latest `main` branch before capturing.
-- Confirm access to `https://revive-ai.plim97527.chatgpt.site` before recording.
+- Confirm access to `https://revive-revenue.vercel.app` before recording.
 - Open every view once to warm assets before recording.
 - Reset the live demo by closing and reopening its modal.
 - Confirm the visible demo amount is ₹11,999.

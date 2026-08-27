@@ -7,7 +7,7 @@ Act as a principal fintech engineer and an adversarial security reviewer. Audit 
 
 Inputs
 - Repository: https://github.com/ReaperXD67/revive-ai
-- Deployment: https://revive-ai.plim97527.chatgpt.site
+- Deployment: https://revive-revenue.vercel.app
 - API contract: docs/openapi.yaml
 - Architecture: docs/ARCHITECTURE.md
 - Known prototype boundary: the dashboard and recovery outcome are simulated; no real payment or customer message is sent.
@@ -27,7 +27,7 @@ Audit every item below
 5. Review the decision engine for currency-unit mistakes, timezone errors, unsupported rail/reason combinations, unsafe defaults, policy precedence, and model-confidence misuse.
 6. Check that a UI success state is impossible after a failed API response and that every product claim maps to implemented behavior or is explicitly labeled simulated/roadmap.
 7. Inspect authentication, authorization, tenant isolation, CSRF relevance, CORS, caching, logging, error leakage, SSRF, XSS, CSP, clickjacking, rate limiting, and dependency advisories.
-8. Verify D1 migrations, indexes, query plans, retention needs, failure modes, backup/restore assumptions, and schema evolution.
+8. Verify Blob key derivation, immutable-write conflict handling, private access, retention needs, failure modes, backup/restore assumptions, and record-version evolution.
 9. Review the causal measurement design for sample-ratio mismatch, unstable bucketing, interference, selection bias, peeking, delayed outcomes, and double attribution.
 10. Run lint, tests, coverage, production build, dependency audit, API probes, browser flow tests, console-log checks, keyboard navigation, responsive checks, and runtime security-header inspection.
 

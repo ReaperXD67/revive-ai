@@ -6,7 +6,7 @@ Recover more recurring revenue while making every automated action safe, explain
 
 ## Implemented prototype slice
 
-The public build implements strict recovery-event validation, a deterministic policy/decision engine, an HMAC-verifying Razorpay-shaped webhook endpoint, D1 event/decision tables with unique duplicate constraints, a runtime health route, and an API-linked interactive simulation. The action adapters, transactional outbox, merchant authentication, tenant isolation, scheduled execution and outcome reconciliation below are the production target state—not claims of live merchant execution.
+The public build implements strict recovery-event validation, a deterministic policy/decision engine, an HMAC-verifying Razorpay-shaped webhook endpoint, private immutable event/decision records with storage-enforced duplicate suppression, a runtime health route, and an API-linked interactive simulation. The action adapters, transactional outbox, merchant authentication, tenant isolation, scheduled execution and outcome reconciliation below are the production target state—not claims of live merchant execution.
 
 ## Event-to-action sequence
 
@@ -157,4 +157,4 @@ Merchant
 
 ## Deployment path
 
-The prototype is a Cloudflare Worker-compatible Vinext application. A production pilot would separate the event gateway, durable queues, relational decision store, model service, policy service and adapters. Start in Razorpay test mode, then shadow live events without actions, then graduate low-risk playbooks one at a time.
+The prototype is a native Next.js application deployed on Vercel with serverless route handlers and a private immutable Blob audit store. A production pilot would separate the event gateway, durable queues, relational operational store, model service, policy service and adapters. Start in Razorpay test mode, then shadow live events without actions, then graduate low-risk playbooks one at a time.

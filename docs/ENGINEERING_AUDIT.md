@@ -1,7 +1,7 @@
 # Engineering and security audit
 
 Audit date: 27 August 2026  
-Scope: public recruiter demo, React client, Next-compatible route handlers, decision engine, D1 persistence, deployment configuration, dependencies, and the main user journey.
+Scope: public recruiter demo, React client, native Next.js route handlers, decision engine, private Blob persistence, deployment configuration, dependencies, and the main user journey.
 
 ## Verdict
 
@@ -31,11 +31,11 @@ Scope: public recruiter demo, React client, Next-compatible route handlers, deci
 ### REV-REL-001 — Idempotency key existed without durable enforcement
 
 - Severity: Medium
-- Location: `lib/server/audit-store.ts:46-88`; `db/schema.ts:12-25`; `drizzle/0000_rainy_skrulls.sql`
+- Location: `lib/server/audit-store.ts`
 - Evidence: the engine returned an idempotency string but no datastore enforced uniqueness.
 - Impact: concurrent or repeated delivery could create repeated decisions after isolate restarts.
-- Fix: Cloudflare D1 tables, a unique `(event_id, action)` index, `INSERT OR IGNORE`, event-primary-key deduplication, generated migration artifacts, and a health probe.
-- Verification: the public `/api/health` reports D1 operational; repeated database keys return `duplicate_suppressed`.
+- Fix: deterministic SHA-256 object paths, private immutable Vercel Blob writes, event-key deduplication, and a storage health probe.
+- Verification: the public `/api/health` reports private storage operational; a first write returns `stored` and the repeated logical key returns `duplicate_suppressed`.
 
 ### REV-UX-001 — UI could claim recovery after API failure
 
@@ -43,7 +43,7 @@ Scope: public recruiter demo, React client, Next-compatible route handlers, deci
 - Location: `app/page.tsx:104-139` and `app/page.tsx:306-309`
 - Evidence: the original client ignored the fetch response and let its timer reach the success state inside a catch block.
 - Impact: the demo could display recovered revenue while its only backend call failed.
-- Fix: success now requires an HTTP-success response containing a plan; failures stop animation and explicitly state that no recovery was claimed. The success panel shows policy, D1 persistence, confidence, mode, and a request proof ID.
+- Fix: success now requires an HTTP-success response containing a plan; failures stop animation and explicitly state that no recovery was claimed. The success panel shows policy, immutable persistence, confidence, mode, and a request proof ID.
 - Verification: the deployed flow reached “Simulated payment captured,” showed `stored`, and emitted no console warnings/errors.
 
 ### REV-POL-001 — Quiet-hour scheduling used UTC
@@ -110,11 +110,11 @@ Scope: public recruiter demo, React client, Next-compatible route handlers, deci
 - 14 unit tests passing.
 - 95.24% line coverage, 93.88% branch coverage, 100% function coverage across the core tested modules.
 - Lint passes.
-- Production Vinext build passes with three API routes.
+- Native Next.js production build passes with three API routes.
 - `npm audit --omit=dev` reports zero vulnerabilities.
-- Public health endpoint: HTTP 200, decision engine operational, D1 operational.
+- Public health endpoint: HTTP 200, decision engine operational, private Vercel Blob operational.
 - Public invalid-signature probe: HTTP 401.
 - Runtime headers verified on the public deployment.
-- Browser flow verified: command center → live demo → hosted decision → D1 audit proof → simulated success; no browser warnings/errors.
+- Browser flow verified: command center → live demo → hosted decision → immutable audit proof → simulated success; no browser warnings/errors.
 
 The reusable adversarial review prompt is in [`ENGINEERING_REVIEW_PROMPT.md`](ENGINEERING_REVIEW_PROMPT.md).

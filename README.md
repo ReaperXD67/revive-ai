@@ -2,16 +2,16 @@
 
 **Autonomous revenue recovery for failed recurring payments.**
 
-[![Live demo](https://img.shields.io/badge/live-demo-d8ff4f?style=flat-square&labelColor=17201d)](https://revive-ai.plim97527.chatgpt.site)
+[![Live demo](https://img.shields.io/badge/live-Vercel-d8ff4f?style=flat-square&labelColor=17201d)](https://revive-revenue.vercel.app)
 [![CI](https://img.shields.io/github/actions/workflow/status/ReaperXD67/revive-ai/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/ReaperXD67/revive-ai/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-14_passing-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
 [![Coverage](https://img.shields.io/badge/core_coverage-95.24%25-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
 [![Production audit](https://img.shields.io/badge/prod_dependencies-0_vulnerabilities-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
 [![License](https://img.shields.io/badge/license-MIT-3178c6?style=flat-square)](LICENSE)
 
-[![Revive revenue command center](docs/assets/revive-command-center.png)](https://revive-ai.plim97527.chatgpt.site)
+[![Revive revenue command center](docs/assets/revive-command-center.png)](https://revive-revenue.vercel.app)
 
-> [Open the public product](https://revive-ai.plim97527.chatgpt.site) · [Check the hosted backend](https://revive-ai.plim97527.chatgpt.site/api/health) · [Read the API contract](docs/openapi.yaml) · [Use the five-minute pitch prompt](docs/PITCH_PROMPT.md)
+> [Open the public product](https://revive-revenue.vercel.app) · [Check the hosted backend](https://revive-revenue.vercel.app/api/health) · [Read the API contract](docs/openapi.yaml) · [Use the five-minute pitch prompt](docs/PITCH_PROMPT.md)
 
 ## The one-minute pitch
 
@@ -35,10 +35,10 @@ This is an independent Razorpay AI Buildathon prototype for **Track 3: AI Revenu
 | Decision engine | Failure-aware action routing, confidence, approval/block modes, consent/contact/value/AFA gates, issuer holds, IST quiet-hour scheduling, evidence, and deterministic idempotency keys |
 | Hosted API | Strict runtime schema validation, byte-size limits, safe errors, no-store responses, request proof IDs, and an OpenAPI 3.1 contract |
 | Webhook boundary | Raw-body HMAC-SHA256 verification, secret fail-closed behavior, event-ID requirement, payload hash, and invalid-signature rejection |
-| Persistence | Cloudflare D1 audit tables, generated SQL migration, prepared statements, indexes, and database-enforced duplicate suppression |
+| Persistence | Private Vercel Blob audit records, deterministic SHA-256 object paths, immutable writes, and storage-enforced duplicate suppression |
 | Security | CSP, clickjacking/MIME/referrer/permissions/HSTS headers, no client secrets, bounded public work, dependency audit, and an explicit residual-risk register |
 | Quality | 14 tests, 95.24% line coverage on the core tested modules, lint, production build, GitHub Actions, and Dependabot |
-| Deployment | Public full-stack edge deployment; frontend, route handlers, secret, and D1 are hosted together |
+| Deployment | Public full-stack Vercel deployment; native Next.js frontend, route handlers, encrypted secrets, and private Blob storage are hosted together |
 
 All customers, amounts, uplift metrics, and payment outcomes visible in the UI are realistic fictional demo data. The product does not initiate a real charge or send a real customer message.
 
@@ -46,13 +46,13 @@ All customers, amounts, uplift metrics, and payment outcomes visible in the UI a
 
 Use this path to see the strongest engineering story in under 90 seconds:
 
-1. Open the [command center](https://revive-ai.plim97527.chatgpt.site) and scan revenue-at-risk, uplift, safe-autonomy, and live-agent activity.
+1. Open the [command center](https://revive-revenue.vercel.app) and scan revenue-at-risk, uplift, safe-autonomy, and live-agent activity.
 2. Select **Review agent plan** to see which actions can run autonomously and which require approval.
 3. Open a priority case to inspect evidence, confidence, policy version, context, and the human override.
 4. Select **Run live demo**, then **Start simulation**. The browser calls the hosted API; success is impossible unless a real response returns a plan.
-5. Inspect policy version, D1 audit status, confidence, execution mode, and request proof in the success panel.
+5. Inspect policy version, immutable audit status, confidence, execution mode, and request proof in the success panel.
 6. Visit **Experiments** for treatment-versus-holdout measurement and **Audit trail** for explainability/proof.
-7. Open [`/api/health`](https://revive-ai.plim97527.chatgpt.site/api/health) to verify the decision engine and durable store independently of the UI.
+7. Open [`/api/health`](https://revive-revenue.vercel.app/api/health) to verify the decision engine and durable store independently of the UI.
 
 ![Revive verified live simulation](docs/assets/revive-live-demo.png)
 
@@ -67,7 +67,7 @@ Primary research is summarized in [`docs/RESEARCH.md`](docs/RESEARCH.md), with d
 ```mermaid
 flowchart LR
     R[Razorpay webhook] --> H[Raw-body HMAC verifier]
-    H --> I[D1 event inbox]
+    H --> I[Private immutable event record]
     I --> C[Failure classifier]
     C --> S[Recovery scorer]
     S --> P[Deterministic policy engine]
@@ -75,7 +75,7 @@ flowchart LR
     P -->|high value / sensitive| U[Human approval]
     A --> O[Outcome webhook]
     O --> X[Experiment ledger]
-    O --> D[D1 decision audit]
+    O --> D[Private immutable decision audit]
     D -. evidence .-> UI[Operations UI]
 ```
 
@@ -85,14 +85,14 @@ The checked-in slice implements the shaded center of this design: authenticated 
 
 | Endpoint | Purpose | Important behavior |
 | --- | --- | --- |
-| `GET /api/health` | Operational proof | Reports decision engine and D1 state; returns 503 when persistence is degraded |
+| `GET /api/health` | Operational proof | Reports decision-engine and private-storage state; returns 503 when persistence is degraded |
 | `POST /api/recovery/simulate` | Build a recovery plan | Strict JSON schema, 4 KiB limit, policy version, persistence state, proof ID |
-| `POST /api/webhooks/razorpay` | Razorpay-shaped ingestion | Verifies HMAC on untouched bytes, requires event ID, caps 64 KiB, deduplicates in D1 |
+| `POST /api/webhooks/razorpay` | Razorpay-shaped ingestion | Verifies HMAC on untouched bytes, requires event ID, caps 64 KiB, and suppresses duplicates with immutable object keys |
 
 Example:
 
 ```bash
-curl -X POST https://revive-ai.plim97527.chatgpt.site/api/recovery/simulate \
+curl -X POST https://revive-revenue.vercel.app/api/recovery/simulate \
   -H "content-type: application/json" \
   -d '{
     "eventId": "evt_readme_001",
@@ -114,7 +114,7 @@ The response contains `SMART_RETRY`, confidence, autonomous/approval/blocked mod
 - Webhook data is hostile until the raw bytes pass HMAC verification.
 - TypeScript types are not trusted as runtime validation.
 - The model/action score never bypasses deterministic policy checks.
-- D1 unique constraints—not process memory—enforce duplicate suppression across isolates.
+- Deterministic SHA-256 paths and immutable Blob writes—not process memory—enforce duplicate suppression across function instances.
 - Contact, consent, issuer, AFA, and money gates can block or require human approval.
 - API responses do not expose stacks, environment variables, secrets, or raw credentials.
 - The browser cannot display a success result after an API error.
@@ -133,7 +133,7 @@ lint passing
 production build passing
 0 production dependency vulnerabilities
 live health check: operational
-live D1 check: operational
+live private Blob check: operational
 invalid webhook signature: HTTP 401
 runtime CSP / frame / MIME headers: verified
 browser console warnings and errors in core demo: none
@@ -159,15 +159,15 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`, select **Run live demo**, and use `/api/health` to inspect local D1. The Sites/Vinext development runtime provisions the logical `DB` binding declared in `.openai/hosting.json`.
+Open `http://localhost:3000` and select **Run live demo**. To exercise persistence locally, link the project with `vercel link`, pull development variables with `vercel env pull`, and inspect `/api/health`.
 
-## Deployment: Sites or Vercel?
+## Deployment
 
-**Current decision: keep one Sites deployment and do not create a duplicate Vercel project.**
+**Production: [revive-revenue.vercel.app](https://revive-revenue.vercel.app).**
 
-The app already has one public URL, a hosted backend, a secret, and D1 inside a Cloudflare Worker-compatible Vinext build. A second platform would add two releases, cross-platform database work, secret duplication, and drift without improving the submission.
+The repository now uses native Next.js 16 and is connected directly to the Vercel project. Production serves the interface and route handlers from one release, keeps webhook credentials in encrypted environment variables, and stores audit evidence as private immutable Blob objects in `sin1`. Pushes can produce deployment previews through the connected GitHub integration.
 
-Vercel becomes compelling after a deliberate migration to standard Next.js output and a portable database adapter—especially when per-PR previews, deployment checks, and conventional Next.js Functions become the priority. The full decision and migration checklist are in [`docs/DEPLOYMENT_DECISION.md`](docs/DEPLOYMENT_DECISION.md).
+The exact deployment contract and verification evidence are in [`docs/DEPLOYMENT_DECISION.md`](docs/DEPLOYMENT_DECISION.md).
 
 ## Repository map
 
@@ -177,9 +177,7 @@ Vercel becomes compelling after a deliberate migration to standard Next.js outpu
 | [`lib/recovery-engine.ts`](lib/recovery-engine.ts) | Deterministic action and policy engine |
 | [`lib/recovery-input.ts`](lib/recovery-input.ts) | Strict runtime request contract |
 | [`lib/webhook-security.ts`](lib/webhook-security.ts) | HMAC verification and payload hashing |
-| [`lib/server/audit-store.ts`](lib/server/audit-store.ts) | Prepared D1 persistence and duplicate suppression |
-| [`db/schema.ts`](db/schema.ts) | Drizzle schema source |
-| [`drizzle/0000_rainy_skrulls.sql`](drizzle/0000_rainy_skrulls.sql) | Reviewed generated migration |
+| [`lib/server/audit-store.ts`](lib/server/audit-store.ts) | Private immutable Blob persistence and duplicate suppression |
 | [`app/api/recovery/simulate/route.ts`](app/api/recovery/simulate/route.ts) | Hosted simulation decision endpoint |
 | [`app/api/webhooks/razorpay/route.ts`](app/api/webhooks/razorpay/route.ts) | Signed webhook boundary |
 | [`app/api/health/route.ts`](app/api/health/route.ts) | Runtime dependency evidence |
@@ -189,7 +187,7 @@ Vercel becomes compelling after a deliberate migration to standard Next.js outpu
 
 ## Resume-ready bullet
 
-Built and publicly shipped an explainable revenue-recovery control plane for Razorpay subscriptions using React 19, TypeScript, edge route handlers, raw-body HMAC webhook authentication, D1-enforced idempotency, deterministic fintech guardrails, causal holdout analytics, 14 automated tests, and 95%+ core coverage.
+Built and publicly shipped an explainable revenue-recovery control plane for Razorpay subscriptions using Next.js 16, React 19, TypeScript, serverless route handlers, raw-body HMAC webhook authentication, immutable storage-enforced idempotency, deterministic fintech guardrails, causal holdout analytics, 14 automated tests, and 95%+ core coverage.
 
 ## Production path
 

@@ -6,7 +6,7 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://revive-ai.plim97527.chatgpt.site'),
+  metadataBase: new URL('https://revive-revenue.vercel.app'),
   title: 'Revive — Autonomous Revenue Recovery',
   description: 'An agentic control plane that recovers failed recurring payments without risking customer trust.',
   openGraph: {
