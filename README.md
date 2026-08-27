@@ -2,152 +2,213 @@
 
 **Autonomous revenue recovery for failed recurring payments.**
 
-[![Track](https://img.shields.io/badge/Razorpay_AI_Buildathon-Track_3%3A_AI_Revenue_Recovery-d8ff4f?style=flat-square&labelColor=17201d)](#why-this-problem)
-[![Tests](https://img.shields.io/badge/tests-6_passing-d8ff4f?style=flat-square&labelColor=17201d)](#run-locally)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square)](https://www.typescriptlang.org/)
+[![Live demo](https://img.shields.io/badge/live-demo-d8ff4f?style=flat-square&labelColor=17201d)](https://revive-ai.plim97527.chatgpt.site)
+[![CI](https://img.shields.io/github/actions/workflow/status/ReaperXD67/revive-ai/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/ReaperXD67/revive-ai/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-14_passing-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
+[![Coverage](https://img.shields.io/badge/core_coverage-95.24%25-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
+[![Production audit](https://img.shields.io/badge/prod_dependencies-0_vulnerabilities-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
+[![License](https://img.shields.io/badge/license-MIT-3178c6?style=flat-square)](LICENSE)
 
-![Revive social preview](public/og.png)
+[![Revive revenue command center](docs/assets/revive-command-center.png)](https://revive-ai.plim97527.chatgpt.site)
 
-## The pitch
+> [Open the public product](https://revive-ai.plim97527.chatgpt.site) · [Check the hosted backend](https://revive-ai.plim97527.chatgpt.site/api/health) · [Read the API contract](docs/openapi.yaml) · [Use the five-minute pitch prompt](docs/PITCH_PROMPT.md)
 
-Failed payments should not automatically become lost customers. Revive listens to recurring-payment failures, understands *why* each one failed, selects the safest high-probability recovery path, and proves how much revenue its actions actually added.
+## The one-minute pitch
 
-It is an agentic control plane designed around three promises:
+A low balance, revoked UPI mandate, expired card, bank outage, authentication requirement, and network timeout are all “failed payments”—but they should not trigger the same recovery action.
 
-1. **Recover intelligently.** Retry timing, payment rail, issuer health, customer value and failure semantics shape the next action.
-2. **Protect customer trust.** Contact caps, quiet hours, consent, RBI-aware thresholds and human approval gates run before every action.
-3. **Prove incrementality.** Stable holdouts distinguish revenue created by Revive from payments that would have recovered anyway.
+Revive turns Razorpay subscription/payment failures into explainable recovery plans. It classifies the failure, selects a rail-aware next action, runs deterministic trust policies, persists an audit record, and measures incremental uplift against a holdout. Models can recommend; policies authorize.
 
-This repository contains a polished interactive product, a working recovery decision engine, a simulated API, automated policy tests, researched architecture, submission copy, and a production-ready five-minute pitch-video prompt.
+The result is an operations product built around three promises:
 
-## Why this problem
+1. **Recover intelligently.** Retry timing, payment rail, issuer health, customer value, and failure semantics shape the next action.
+2. **Protect customer trust.** Consent, contact caps, IST quiet hours, UPI AutoPay thresholds, and high-value approval gates run before execution.
+3. **Prove incrementality.** Stable holdouts distinguish revenue created by Revive from payments that would have recovered naturally.
 
-Razorpay documents several recurring-payment failure causes: expired cards, bank blocks, insufficient balance and cancelled mandates. A failed subscription moves to `pending`; after retries are exhausted it moves to `halted`, and some later collections require manual intervention. Razorpay also notes that failed recurring payments can cost early-stage SaaS businesses up to 10% of revenue. ([payment retries](https://razorpay.com/docs/payments/subscriptions/payment-retries/?preferred-country=IN), [SaaS decision guide](https://razorpay.com/blog/payment-gateways-saas-startups-decision))
+This is an independent Razorpay AI Buildathon prototype for **Track 3: AI Revenue Recovery**.
 
-The infrastructure primitives already exist—failure events, error taxonomies, retries, hosted update flows and Payment Links. The unsolved product problem is coordinating those primitives at the merchant level with context, trust controls, explanations and causal measurement.
+## What is actually implemented
 
-Revive is that coordination layer.
-
-## Product tour
-
-| Surface | What it demonstrates |
+| Layer | Implemented proof |
 | --- | --- |
-| Command center | Recovered revenue, incremental uplift, safe autonomy and a live agent activity feed |
-| Recovery queue | Value- and probability-ranked cases across UPI AutoPay, cards and eMandate |
-| Decision drawer | Evidence, model confidence, policy version, customer context and approval controls |
-| Agent playbooks | Specialist event, reasoning, policy and action agents with bounded autonomy |
-| Experiments | Treatment/holdout measurement, confidence and segment-level uplift |
-| Audit trail | Immutable decision IDs, policy outcomes, confidence and proof hashes |
-| Live demo | A four-stage failure-to-recovery simulation backed by a real local API route |
+| Product | Responsive command center, ranked recovery queue, explainable case drawer, agent playbooks, experiment analysis, audit trail, and a live modal flow |
+| Decision engine | Failure-aware action routing, confidence, approval/block modes, consent/contact/value/AFA gates, issuer holds, IST quiet-hour scheduling, evidence, and deterministic idempotency keys |
+| Hosted API | Strict runtime schema validation, byte-size limits, safe errors, no-store responses, request proof IDs, and an OpenAPI 3.1 contract |
+| Webhook boundary | Raw-body HMAC-SHA256 verification, secret fail-closed behavior, event-ID requirement, payload hash, and invalid-signature rejection |
+| Persistence | Cloudflare D1 audit tables, generated SQL migration, prepared statements, indexes, and database-enforced duplicate suppression |
+| Security | CSP, clickjacking/MIME/referrer/permissions/HSTS headers, no client secrets, bounded public work, dependency audit, and an explicit residual-risk register |
+| Quality | 14 tests, 95.24% line coverage on the core tested modules, lint, production build, GitHub Actions, and Dependabot |
+| Deployment | Public full-stack edge deployment; frontend, route handlers, secret, and D1 are hosted together |
 
-The dashboard uses realistic fictional data. No real customer data, credentials, charges or customer messages are used.
+All customers, amounts, uplift metrics, and payment outcomes visible in the UI are realistic fictional demo data. The product does not initiate a real charge or send a real customer message.
+
+## Recruiter demo path
+
+Use this path to see the strongest engineering story in under 90 seconds:
+
+1. Open the [command center](https://revive-ai.plim97527.chatgpt.site) and scan revenue-at-risk, uplift, safe-autonomy, and live-agent activity.
+2. Select **Review agent plan** to see which actions can run autonomously and which require approval.
+3. Open a priority case to inspect evidence, confidence, policy version, context, and the human override.
+4. Select **Run live demo**, then **Start simulation**. The browser calls the hosted API; success is impossible unless a real response returns a plan.
+5. Inspect policy version, D1 audit status, confidence, execution mode, and request proof in the success panel.
+6. Visit **Experiments** for treatment-versus-holdout measurement and **Audit trail** for explainability/proof.
+7. Open [`/api/health`](https://revive-ai.plim97527.chatgpt.site/api/health) to verify the decision engine and durable store independently of the UI.
+
+![Revive verified live simulation](docs/assets/revive-live-demo.png)
+
+## Why this problem matters
+
+Razorpay documents that failed subscriptions can move to `pending` and then `halted` after retries, with failure causes including expired cards, bank blocks, insufficient balance, and cancelled mandates. Its SaaS guidance also describes involuntary churn as a material revenue risk. The infrastructure primitives—events, reasons, retries, update flows, and Payment Links—already exist. The product gap is coordinating them with context, customer-trust controls, explanations, and causal measurement.
+
+Primary research is summarized in [`docs/RESEARCH.md`](docs/RESEARCH.md), with direct links to Razorpay and RBI sources.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    R[Razorpay events] --> V[Signature verifier]
-    V --> I[Idempotent event store]
+    R[Razorpay webhook] --> H[Raw-body HMAC verifier]
+    H --> I[D1 event inbox]
     I --> C[Failure classifier]
     C --> S[Recovery scorer]
-    S --> P[Policy engine]
-    P -->|safe| A[Action router]
-    P -->|high value / sensitive| H[Human approval]
-    A --> T[Smart retry]
-    A --> L[Payment Link / mandate repair]
-    A --> M[Customer message]
-    T & L & M --> W[Outcome webhooks]
-    W --> E[Experiment + uplift ledger]
-    W --> U[Immutable audit trail]
+    S --> P[Deterministic policy engine]
+    P -->|safe| A[Action adapter]
+    P -->|high value / sensitive| U[Human approval]
+    A --> O[Outcome webhook]
+    O --> X[Experiment ledger]
+    O --> D[D1 decision audit]
+    D -. evidence .-> UI[Operations UI]
 ```
 
-The checked-in decision engine implements failure-aware routing, UPI AutoPay AFA handling, contact/consent/value guardrails, safe scheduling, evidence generation and deterministic idempotency keys. See [the detailed architecture](docs/ARCHITECTURE.md).
+The checked-in slice implements the shaded center of this design: authenticated webhook ingestion, durable deduplication/audit, a deterministic plan, and the interactive proof flow. Real payment/message adapters, an outbox, and multi-tenant authorization remain explicit pilot blockers. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/ENGINEERING_AUDIT.md`](docs/ENGINEERING_AUDIT.md).
 
-## Decision contract
+## Hosted API
 
-`POST /api/recovery/simulate`
+| Endpoint | Purpose | Important behavior |
+| --- | --- | --- |
+| `GET /api/health` | Operational proof | Reports decision engine and D1 state; returns 503 when persistence is degraded |
+| `POST /api/recovery/simulate` | Build a recovery plan | Strict JSON schema, 4 KiB limit, policy version, persistence state, proof ID |
+| `POST /api/webhooks/razorpay` | Razorpay-shaped ingestion | Verifies HMAC on untouched bytes, requires event ID, caps 64 KiB, deduplicates in D1 |
 
-```json
-{
-  "eventId": "evt_demo_4821",
-  "customerId": "cust_demo_nisha",
-  "amount": 11999,
-  "failureReason": "insufficient_balance",
-  "rail": "upi_autopay",
-  "occurredAt": "2026-08-27T09:42:00.000Z",
-  "contactsLast72Hours": 0,
-  "hasMessagingConsent": true,
-  "issuerHealthy": true,
-  "lifetimeValue": 148200
-}
+Example:
+
+```bash
+curl -X POST https://revive-ai.plim97527.chatgpt.site/api/recovery/simulate \
+  -H "content-type: application/json" \
+  -d '{
+    "eventId": "evt_readme_001",
+    "customerId": "cust_demo_nisha",
+    "amount": 11999,
+    "failureReason": "insufficient_balance",
+    "rail": "upi_autopay",
+    "contactsLast72Hours": 0,
+    "hasMessagingConsent": true,
+    "issuerHealthy": true,
+    "lifetimeValue": 148200
+  }'
 ```
 
-The response returns the selected action, confidence, execution mode, schedule, policy checks, evidence and a stable idempotency key. In a production Razorpay integration, the event listener would verify the HMAC-SHA256 signature against the raw body and deduplicate on `x-razorpay-event-id`, as required by Razorpay's [webhook guidance](https://razorpay.com/docs/webhooks/validate-test/?preferred-country=IN).
+The response contains `SMART_RETRY`, confidence, autonomous/approval/blocked mode, an IST-safe schedule, five policy results, evidence, a stable action key, database persistence state, and a request proof ID. The complete contract is in [`docs/openapi.yaml`](docs/openapi.yaml).
 
-## Trust and compliance by design
+## Trust model
 
-- Raw-body webhook signature verification before processing
-- Duplicate and out-of-order event safety
-- Consent and message-frequency enforcement
-- Quiet-hour scheduling
-- Human approval above configurable value thresholds
-- UPI AutoPay authentication routing above the regular-industry ₹15,000 no-AFA limit
-- No storage of card or UPI credentials
-- Versioned policy result and evidence attached to every decision
-- Kill switch and issuer-health holds before execution
+- Webhook data is hostile until the raw bytes pass HMAC verification.
+- TypeScript types are not trusted as runtime validation.
+- The model/action score never bypasses deterministic policy checks.
+- D1 unique constraints—not process memory—enforce duplicate suppression across isolates.
+- Contact, consent, issuer, AFA, and money gates can block or require human approval.
+- API responses do not expose stacks, environment variables, secrets, or raw credentials.
+- The browser cannot display a success result after an API error.
+- No PAN, CVV, UPI PIN, card/mandate credential, or real customer PII is stored.
 
-Razorpay supports UPI AutoPay, cards and eMandate for subscriptions; each rail has distinct recovery mechanics. For regular-industry UPI AutoPay debits above ₹15,000, the customer must approve the transaction with a UPI PIN. ([supported methods](https://razorpay.com/docs/payments/subscriptions/supported-payment-methods/?preferred-country=IN), [UPI AutoPay](https://razorpay.com/docs/payments/payment-gateway/s2s-integration/recurring-payments/upi/))
+The public-demo verdict and remaining pilot blockers are documented in [`docs/ENGINEERING_AUDIT.md`](docs/ENGINEERING_AUDIT.md). A reusable red-team prompt is in [`docs/ENGINEERING_REVIEW_PROMPT.md`](docs/ENGINEERING_REVIEW_PROMPT.md).
 
-## Run locally
+## Engineering evidence
+
+```text
+14 tests passing
+95.24% line coverage
+93.88% branch coverage
+100% function coverage
+lint passing
+production build passing
+0 production dependency vulnerabilities
+live health check: operational
+live D1 check: operational
+invalid webhook signature: HTTP 401
+runtime CSP / frame / MIME headers: verified
+browser console warnings and errors in core demo: none
+```
+
+Run the same gate locally:
+
+```bash
+npm ci
+npm run check
+npm run test:coverage
+npm audit --omit=dev
+```
+
+GitHub Actions runs the equivalent gate on pushes and pull requests. Dependency updates are monitored by Dependabot.
+
+## Local development
 
 Requirements: Node.js 22.13 or newer.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000` and select **Run live demo**.
+Open `http://localhost:3000`, select **Run live demo**, and use `/api/health` to inspect local D1. The Sites/Vinext development runtime provisions the logical `DB` binding declared in `.openai/hosting.json`.
 
-Quality checks:
+## Deployment: Sites or Vercel?
 
-```bash
-npm run lint
-npm test
-npm run build
-```
+**Current decision: keep one Sites deployment and do not create a duplicate Vercel project.**
 
-The tests cover action selection, value gates, contact caps, issuer holds, UPI AFA routing and stable idempotency.
+The app already has one public URL, a hosted backend, a secret, and D1 inside a Cloudflare Worker-compatible Vinext build. A second platform would add two releases, cross-platform database work, secret duplication, and drift without improving the submission.
 
-## Technology
+Vercel becomes compelling after a deliberate migration to standard Next.js output and a portable database adapter—especially when per-PR previews, deployment checks, and conventional Next.js Functions become the priority. The full decision and migration checklist are in [`docs/DEPLOYMENT_DECISION.md`](docs/DEPLOYMENT_DECISION.md).
 
-- React 19 + Next.js-compatible App Router
-- TypeScript decision engine and API route
-- Vinext/Vite output for Cloudflare Workers
-- Tailwind CSS pipeline plus a custom responsive design system
-- Lucide icons
-- Node test runner with `tsx`
+## Repository map
 
-## Production roadmap
+| Path | Responsibility |
+| --- | --- |
+| [`app/page.tsx`](app/page.tsx) | Interactive recruiter/demo experience and truth-linked API success state |
+| [`lib/recovery-engine.ts`](lib/recovery-engine.ts) | Deterministic action and policy engine |
+| [`lib/recovery-input.ts`](lib/recovery-input.ts) | Strict runtime request contract |
+| [`lib/webhook-security.ts`](lib/webhook-security.ts) | HMAC verification and payload hashing |
+| [`lib/server/audit-store.ts`](lib/server/audit-store.ts) | Prepared D1 persistence and duplicate suppression |
+| [`db/schema.ts`](db/schema.ts) | Drizzle schema source |
+| [`drizzle/0000_rainy_skrulls.sql`](drizzle/0000_rainy_skrulls.sql) | Reviewed generated migration |
+| [`app/api/recovery/simulate/route.ts`](app/api/recovery/simulate/route.ts) | Hosted simulation decision endpoint |
+| [`app/api/webhooks/razorpay/route.ts`](app/api/webhooks/razorpay/route.ts) | Signed webhook boundary |
+| [`app/api/health/route.ts`](app/api/health/route.ts) | Runtime dependency evidence |
+| [`docs/PITCH_PROMPT.md`](docs/PITCH_PROMPT.md) | Detailed five-minute Obsidian video prompt |
+| [`docs/SUBMISSION.md`](docs/SUBMISSION.md) | Copy-ready buildathon submission |
+| [`docs/ENGINEERING_AUDIT.md`](docs/ENGINEERING_AUDIT.md) | Fixed loopholes and residual production blockers |
 
-1. Connect Razorpay test-mode subscription and payment webhooks.
-2. Persist encrypted events, policy versions, experiments and outcomes.
-3. Train per-merchant recovery propensities with conservative global priors.
-4. Add Razorpay Payment Link and subscription update adapters.
-5. Integrate consent-aware WhatsApp/email/SMS providers.
-6. Launch in shadow mode, then graduate actions from approval to bounded autonomy.
-7. Expose recovered-revenue attribution to finance and customer-success systems.
+## Resume-ready bullet
 
-## Repository guide
+Built and publicly shipped an explainable revenue-recovery control plane for Razorpay subscriptions using React 19, TypeScript, edge route handlers, raw-body HMAC webhook authentication, D1-enforced idempotency, deterministic fintech guardrails, causal holdout analytics, 14 automated tests, and 95%+ core coverage.
 
-- [`app/page.tsx`](app/page.tsx) — interactive product experience
-- [`lib/recovery-engine.ts`](lib/recovery-engine.ts) — deterministic decision and policy engine
-- [`app/api/recovery/simulate/route.ts`](app/api/recovery/simulate/route.ts) — simulation endpoint
-- [`docs/RESEARCH.md`](docs/RESEARCH.md) — evidence and product thesis
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — production system design
-- [`docs/PITCH_PROMPT.md`](docs/PITCH_PROMPT.md) — detailed five-minute Obsidian pipeline prompt
-- [`docs/SUBMISSION.md`](docs/SUBMISSION.md) — copy-ready buildathon form answers
+## Production path
 
-## Acknowledgement
+1. Add server-enforced identity, roles, merchant scoping, and cross-tenant tests.
+2. Connect Razorpay test-mode subscription/payment events and reconcile out-of-order outcomes.
+3. Add a transactional outbox, leased action workers, per-subscription locks, dead letters, and replay tooling.
+4. Implement real Razorpay retry, hosted update, Payment Link, and consent-aware message adapters.
+5. Add edge rate limits, structured/redacted logs, traces, SLOs, alerts, backup/restore drills, and retention workflows.
+6. Run shadow mode on live-shaped traffic; graduate only low-risk playbooks to bounded autonomy.
+7. Validate uplift with stable bucketing, sample-ratio checks, delayed-outcome windows, and finance reconciliation.
 
-Built for the Razorpay AI Buildathon, Track 3: AI Revenue Recovery. Revive is an independent prototype and is not an official Razorpay product.
+## Pitch and submission kit
+
+- [`docs/PITCH_PROMPT.md`](docs/PITCH_PROMPT.md) — exact five-minute video brief for the Obsidian pipeline
+- [`docs/SUBMISSION.md`](docs/SUBMISSION.md) — form answers, short pitch, and resume bullet
+- [`docs/RESEARCH.md`](docs/RESEARCH.md) — problem evidence and sources
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — production target state
+- [`docs/ENGINEERING_REVIEW_PROMPT.md`](docs/ENGINEERING_REVIEW_PROMPT.md) — adversarial loophole hunt
+
+## License and acknowledgement
+
+MIT licensed. Built for the Razorpay AI Buildathon, Track 3: AI Revenue Recovery. Revive is an independent prototype and is not an official Razorpay product.

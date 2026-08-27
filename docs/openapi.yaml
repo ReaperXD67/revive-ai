@@ -1,0 +1,135 @@
+openapi: 3.1.0
+info:
+  title: Revive Recovery API
+  version: 1.0.0
+  description: Hosted decision, health, and Razorpay webhook endpoints for the Revive buildathon prototype.
+servers:
+  - url: https://revive-ai.plim97527.chatgpt.site
+paths:
+  /api/health:
+    get:
+      summary: Check the decision engine and durable audit store
+      operationId: getHealth
+      responses:
+        "200":
+          description: Every implemented dependency is operational.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "503":
+          description: The decision engine is available but the durable store is degraded.
+  /api/recovery/simulate:
+    post:
+      summary: Produce and persist a policy-gated recovery plan
+      operationId: simulateRecovery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecoveryEvent"
+      responses:
+        "200":
+          description: A deterministic recovery plan was produced.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationResponse"
+        "413":
+          description: Request exceeds 4 KiB.
+        "415":
+          description: Request is not application/json.
+        "422":
+          description: Runtime validation failed.
+  /api/webhooks/razorpay:
+    post:
+      summary: Authenticate and deduplicate a Razorpay webhook
+      operationId: ingestRazorpayWebhook
+      parameters:
+        - in: header
+          name: x-razorpay-signature
+          required: true
+          schema: { type: string, pattern: "^[a-fA-F0-9]{64}$" }
+        - in: header
+          name: x-razorpay-event-id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        "202":
+          description: Signature verified and event durably accepted.
+        "200":
+          description: A previously accepted event was safely suppressed as a duplicate.
+        "401":
+          description: Signature or event ID is invalid.
+        "413":
+          description: Payload exceeds 64 KiB.
+        "503":
+          description: Secret or durable ingestion is unavailable.
+components:
+  schemas:
+    RecoveryEvent:
+      type: object
+      additionalProperties: false
+      required: [eventId, customerId, failureReason, rail]
+      properties:
+        eventId: { type: string, minLength: 1, maxLength: 128 }
+        customerId: { type: string, minLength: 1, maxLength: 128 }
+        amount: { type: number, exclusiveMinimum: 0, maximum: 10000000, default: 11999 }
+        failureReason:
+          type: string
+          enum: [insufficient_balance, mandate_revoked, card_expired, bank_unavailable, authentication_required, network_timeout, unknown]
+        rail: { type: string, enum: [upi_autopay, card, emandate] }
+        occurredAt: { type: string, format: date-time }
+        contactsLast72Hours: { type: integer, minimum: 0, maximum: 20, default: 0 }
+        hasMessagingConsent: { type: boolean, default: true }
+        issuerHealthy: { type: boolean, default: true }
+        lifetimeValue: { type: number, minimum: 0, maximum: 100000000, default: 148200 }
+    PolicyCheck:
+      type: object
+      required: [name, passed, detail]
+      properties:
+        name: { type: string }
+        passed: { type: boolean }
+        detail: { type: string }
+    RecoveryPlan:
+      type: object
+      required: [eventId, idempotencyKey, action, confidence, executionMode, scheduledFor, policyChecks, evidence]
+      properties:
+        eventId: { type: string }
+        idempotencyKey: { type: string }
+        action:
+          type: string
+          enum: [SMART_RETRY, REQUEST_NEW_MANDATE, SEND_PAYMENT_LINK, WAIT_FOR_ISSUER, REQUEST_AUTHENTICATION, HUMAN_REVIEW]
+        confidence: { type: number, minimum: 0, maximum: 1 }
+        executionMode: { type: string, enum: [autonomous, approval_required, blocked] }
+        scheduledFor: { type: string, format: date-time }
+        policyChecks:
+          type: array
+          items: { $ref: "#/components/schemas/PolicyCheck" }
+        evidence:
+          type: array
+          items: { type: string }
+    SimulationResponse:
+      type: object
+      required: [requestId, simulated, policyVersion, persistence, plan]
+      properties:
+        requestId: { type: string, format: uuid }
+        simulated: { type: boolean, const: true }
+        policyVersion: { type: string }
+        persistence: { type: string, enum: [stored, duplicate_suppressed, degraded] }
+        plan: { $ref: "#/components/schemas/RecoveryPlan" }
+    Health:
+      type: object
+      required: [status, service, version, checks, timestamp]
+      properties:
+        status: { type: string, enum: [operational, degraded] }
+        service: { type: string }
+        version: { type: string }
+        checks: { type: object }
+        timestamp: { type: string, format: date-time }

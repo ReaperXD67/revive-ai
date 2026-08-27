@@ -4,6 +4,10 @@
 
 Recover more recurring revenue while making every automated action safe, explainable, measurable and reversible.
 
+## Implemented prototype slice
+
+The public build implements strict recovery-event validation, a deterministic policy/decision engine, an HMAC-verifying Razorpay-shaped webhook endpoint, D1 event/decision tables with unique duplicate constraints, a runtime health route, and an API-linked interactive simulation. The action adapters, transactional outbox, merchant authentication, tenant isolation, scheduled execution and outcome reconciliation below are the production target state—not claims of live merchant execution.
+
 ## Event-to-action sequence
 
 ```mermaid
@@ -42,7 +46,7 @@ sequenceDiagram
 
 ### 1. Event gateway
 
-- accepts only Razorpay test/live webhook origins configured by the merchant;
+- accepts bounded JSON webhook payloads and fails closed when the shared secret is unavailable;
 - computes HMAC-SHA256 over the untouched request bytes;
 - records `x-razorpay-event-id` before downstream processing;
 - normalizes subscription, invoice, payment and error entities;
