@@ -26,7 +26,15 @@ https://revive-revenue.vercel.app
 
 ## 5-min Pitch Video Link
 
-Add the final hosted video URL here after rendering and upload.
+Paste the final verified public video URL here after rendering and upload. Recommended: an Unlisted YouTube link or a Google Drive link set to **Anyone with the link — Viewer**. Do not paste the product URL in this field.
+
+## Build Challenges & Technical Obstacles
+
+The hardest challenge was making an agentic recovery demo credible in a stateless serverless environment where webhook events may be duplicated, reordered, malformed, or malicious. TypeScript types alone could not protect runtime boundaries, and an in-memory deduplication set would fail across function instances. I solved this with strict runtime schemas and byte limits, raw-body HMAC-SHA256 verification, deterministic action keys, SHA-256-derived private Blob paths, and immutable create-only writes so the storage layer—not process memory—suppresses duplicates. A second challenge was preventing AI confidence from bypassing fintech safety. Recovery recommendations therefore pass deterministic consent, contact-frequency, IST quiet-hour, issuer-health, UPI AutoPay authentication, and high-value approval policies before receiving an execution mode. Finally, the UI had to prove rather than merely claim that the backend works. I added System Proof, a live `stored → duplicate_suppressed` replay challenge, a configurable Decision Lab, sanitized deployment evidence, automated tests, CI, security headers, and explicit labels separating simulated portfolio outcomes from live engineering evidence.
+
+## Final Submission Confirmation
+
+Tick the confirmation only after the final video URL opens without requesting access, the live product and GitHub links work, and every answer has been reviewed. The form warns that no further edits can be made after submission.
 
 ## One-line version
 

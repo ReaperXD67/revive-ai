@@ -212,6 +212,7 @@ Built and publicly shipped an explainable revenue-recovery control plane for Raz
 ## Pitch and submission kit
 
 - [`docs/PITCH_PROMPT.md`](docs/PITCH_PROMPT.md) — exact five-minute video brief for the Obsidian pipeline
+- [`docs/OBSIDIAN_BROWSER_VIDEO_PROMPT.md`](docs/OBSIDIAN_BROWSER_VIDEO_PROMPT.md) — autonomous browser capture, narration, editing, and verification prompt
 - [`docs/SUBMISSION.md`](docs/SUBMISSION.md) — form answers, short pitch, and resume bullet
 - [`docs/RESEARCH.md`](docs/RESEARCH.md) — problem evidence and sources
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — production target state
