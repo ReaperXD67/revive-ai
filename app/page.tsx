@@ -15,6 +15,7 @@ import {
 } from './data';
 import type { RecoveryPlan } from '../lib/recovery-engine';
 import { SystemProof } from './system-proof';
+import { LandingPage } from './landing-page';
 
 const navItems = [
   { id: 'command' as NavView, label: 'Command center', icon: Command },
@@ -44,11 +45,34 @@ type SimulationResponse = {
 };
 
 export default function Home() {
+  const [experience, setExperience] = useState<'story' | 'command'>('story');
+  const [launchDemo, setLaunchDemo] = useState(false);
+
+  const openCommand = () => {
+    setLaunchDemo(false);
+    setExperience('command');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  const openDemo = () => {
+    setLaunchDemo(true);
+    setExperience('command');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  if (experience === 'story') {
+    return <LandingPage onOpenCommand={openCommand} onRunDemo={openDemo} />;
+  }
+
+  return <DashboardApp initialDemoOpen={launchDemo} onBackToStory={() => setExperience('story')} />;
+}
+
+function DashboardApp({ initialDemoOpen = false, onBackToStory }: { initialDemoOpen?: boolean; onBackToStory: () => void }) {
   const [view, setView] = useState<NavView>('command');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCase, setSelectedCase] = useState<RecoveryCase | null>(null);
   const [planOpen, setPlanOpen] = useState(false);
-  const [demoOpen, setDemoOpen] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(initialDemoOpen);
   const [demoStep, setDemoStep] = useState(0);
   const [running, setRunning] = useState(false);
   const [demoResult, setDemoResult] = useState<SimulationResponse | null>(null);
@@ -142,7 +166,7 @@ export default function Home() {
       {sidebarOpen && <button className="sidebar-scrim" onClick={() => setSidebarOpen(false)} aria-label="Close navigation" />}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-top">
-          <button className="brand-mark" onClick={() => chooseView('command')} aria-label="Go to command center"><span>R</span> Revive</button>
+          <button className="brand-mark" onClick={onBackToStory} aria-label="Back to the Revive story"><span>R</span> Revive</button>
           <button className="mobile-close" onClick={() => setSidebarOpen(false)} aria-label="Close navigation"><X size={18} /></button>
         </div>
         <div className="nav-section-label">OPERATE</div>
