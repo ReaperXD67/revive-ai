@@ -66,10 +66,10 @@ const guardrails = [
 ];
 
 const reveal = {
-  initial: { opacity: 0, y: 44 },
+  initial: { opacity: 0, y: 36 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { amount: 0.42, once: false },
-  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+  viewport: { amount: 0.36, once: true },
+  transition: { duration: 0.82, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
 };
 
 export function LandingPage({ onOpenCommand, onRunDemo }: LandingPageProps) {
@@ -79,12 +79,19 @@ export function LandingPage({ onOpenCommand, onRunDemo }: LandingPageProps) {
     target: storyRef,
     offset: ['start start', 'end end'],
   });
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 72, damping: 27, mass: 0.5 });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    mass: 0.7,
+    restDelta: 0.0001,
+    restSpeed: 0.0001,
+    skipInitialAnimation: true,
+  });
   const progressScale = useTransform(smoothProgress, [0.07, 0.95], [0, 1]);
   const limeGlow = useTransform(smoothProgress, [0, 0.3, 0.58, 0.82, 1], [0.5, 0.16, 0.42, 0.72, 0.2]);
   const warmGlow = useTransform(smoothProgress, [0, 0.45, 0.78, 1], [0.26, 0.5, 0.76, 0.3]);
 
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+  useMotionValueEvent(smoothProgress, 'change', (latest) => {
     const next = latest < 0.25 ? 0 : latest < 0.41 ? 1 : latest < 0.59 ? 2 : latest < 0.76 ? 3 : 4;
     setActiveChapter((current) => (current === next ? current : next));
   });
@@ -126,7 +133,7 @@ export function LandingPage({ onOpenCommand, onRunDemo }: LandingPageProps) {
 
       <section className="cinematic-story" ref={storyRef} id="top">
         <div className="core-stage" aria-hidden="false">
-          <RevenueCore progress={smoothProgress} />
+          <RevenueCore progress={scrollYProgress} />
           <div className="stage-vignette" />
           <motion.div className="stage-glow lime" style={{ opacity: limeGlow }} />
           <motion.div className="stage-glow warm" style={{ opacity: warmGlow }} />
@@ -163,8 +170,8 @@ export function LandingPage({ onOpenCommand, onRunDemo }: LandingPageProps) {
                   key={label}
                   initial={{ opacity: 0, y: 22 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ amount: 0.7, once: false }}
-                  transition={{ delay: index * 0.055, duration: 0.42 }}
+                  viewport={{ amount: 0.62, once: true }}
+                  transition={{ delay: index * 0.045, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <span><Icon size={17} /></span>
                   <strong>{label}</strong>

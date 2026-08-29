@@ -23,6 +23,14 @@ No open P0, P1, or P2 issues.
 
 ## Full-view Evidence
 
+- Smoothed desktop hero: `output/playwright/revive-smooth-hero.png`
+- Smoothed desktop signal: `output/playwright/revive-smooth-signal.png`
+- Smoothed desktop proof: `output/playwright/revive-smooth-proof.png`
+- Smoothed mobile hero: `output/playwright/revive-smooth-mobile-hero.png`
+- Smoothed mobile proof: `output/playwright/revive-smooth-mobile-proof-2.png`
+- Smoothed 375 px portrait: `output/playwright/revive-smooth-375-settled.png`
+- Smoothed 844 × 390 landscape: `output/playwright/revive-smooth-landscape-final.png`
+- Smoothed reduced-motion state: `output/playwright/revive-smooth-reduced-motion.png`
 - Desktop hero: `output/playwright/revive-desktop-hero-final.png`
 - Desktop signal: `output/playwright/revive-desktop-signal-final.png`
 - Desktop reason: `output/playwright/revive-desktop-reason-final.png`
@@ -35,6 +43,8 @@ No open P0, P1, or P2 issues.
 
 ## Combined Source Comparisons
 
+- Smoothed hero source crop beside implementation: `output/playwright/revive-smooth-comparison-hero.png`
+- Smoothed proof source crop beside implementation: `output/playwright/revive-smooth-comparison-proof.png`
 - Hero source crop beside implementation: `output/playwright/revive-comparison-hero.png`
 - Proof source crop beside implementation: `output/playwright/revive-comparison-proof.png`
 
@@ -51,6 +61,8 @@ The source is a tall presentation board, so focused source regions were normaliz
 - Mobile document width is 375 CSS px inside a 390 CSS px viewport; no horizontal overflow is present.
 - Reduced-motion mode renders a stable landing state and suppresses long transitions.
 - Browser console: 0 errors and 0 warnings after the complete primary journey.
+- Desktop motion benchmark, same Chrome/viewport/scroll curve: current production averaged 27.75 ms per frame with a 50.2 ms p95; the smoothed implementation averaged 8.01 ms with a 13.1 ms p95 and no frames above 33 ms.
+- Mobile motion benchmark at 390 × 844: 10.55 ms average, 22.6 ms p95, and a document width exactly matching the 390 px viewport.
 
 ## Comparison History
 
@@ -58,5 +70,6 @@ The source is a tall presentation board, so focused source regions were normaliz
 - Iteration 2: desktop review found P1 object/copy crowding in hero, signal, reason, and proof. The camera path, scene offsets, chapter-specific opacity, gradients, and content scrims were corrected.
 - Iteration 3: mobile review found the dashboard header CTA could be intercepted after scroll. The mobile header was made fixed, layered, and translucent; the interaction was repeated successfully.
 - Iteration 4: combined hero and proof comparisons passed with no remaining P0/P1/P2 findings.
+- Iteration 5: replaced frame-dependent interpolation with delta-time damping, stabilized transparent materials, added adaptive render resolution and a lightweight energy spine, reduced mobile scene complexity, removed the expensive full-screen blur pass, and stopped replaying entry animations. A temporary mobile hash-position regression from off-screen paint containment was found and fixed by limiting containment to desktop. The short-landscape hero was tightened so both primary actions remain visible. Final desktop, 375 px portrait, short-landscape, mobile proof, reduced-motion, and main-demo checks passed again.
 
 final result: passed
