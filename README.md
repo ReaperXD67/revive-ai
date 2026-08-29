@@ -7,9 +7,10 @@
 [![Tests](https://img.shields.io/badge/tests-16_passing-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
 [![Coverage](https://img.shields.io/badge/core_coverage-95.75%25-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
 [![Production audit](https://img.shields.io/badge/prod_dependencies-0_vulnerabilities-d8ff4f?style=flat-square&labelColor=17201d)](#engineering-evidence)
+[![Three.js](https://img.shields.io/badge/Three.js-live_3D-d8ff4f?style=flat-square&labelColor=17201d)](#a-recovery-you-can-enter)
 [![License](https://img.shields.io/badge/license-MIT-3178c6?style=flat-square)](LICENSE)
 
-[![Revive revenue command center](docs/assets/revive-command-center.png)](https://revive-revenue.vercel.app)
+[![Revive cinematic 3D revenue-recovery core](docs/assets/revive-cinematic-core.png)](https://revive-revenue.vercel.app)
 
 > [Open the public product](https://revive-revenue.vercel.app) · [Challenge the live backend](https://revive-revenue.vercel.app/api/proof) · [Check service health](https://revive-revenue.vercel.app/api/health) · [Read the API contract](docs/openapi.yaml) · [Use the five-minute pitch prompt](docs/PITCH_PROMPT.md)
 
@@ -27,11 +28,25 @@ The result is an operations product built around three promises:
 
 This is an independent Razorpay AI Buildathon prototype for **Track 3: AI Revenue Recovery**.
 
+## A recovery you can enter
+
+The landing page is not a prerecorded render. It is a live Three.js scene driven continuously by native scroll position and pointer depth. One payment failure becomes a physical system: its shell dismantles, signal paths converge, policy rings align, and the engine rebuilds around recovered revenue.
+
+| Story chapter | Live 3D behavior | Product meaning |
+| --- | --- | --- |
+| Signal | Thirty-two physical shell segments separate while six failure nodes and curved data paths appear | “Payment failed” is unpacked into distinct causes |
+| Reason | The camera moves through the shell toward a shader-lit decision core while packets travel inward | Evidence is classified before an action is chosen |
+| Guardrail | Concentric metallic rings align around the core | Deterministic trust policies bound autonomy |
+| Recovery | The assembly resolves inward, the core intensifies, and layered shockwaves propagate | The selected rail produces a measurable outcome |
+| Proof | Motion settles and hands the story to the interactive command center and live backend evidence | Every claim remains inspectable and replayable |
+
+The scene uses a custom Fresnel/scan-line shader, Catmull–Rom signal tubes, moving energy packets, scroll-velocity depth streaks, variable-FOV camera choreography, pointer lighting, and additive energy layers. It progressively reduces geometry and pixel density on compact or lower-memory devices, avoids expensive full-frame post-processing, and presents a static readable state when `prefers-reduced-motion` is enabled.
+
 ## What is actually implemented
 
 | Layer | Implemented proof |
 | --- | --- |
-| Product | Responsive command center, ranked recovery queue, explainable case drawer, agent playbooks, experiment analysis, audit trail, live modal flow, System Proof, replay challenge, and interactive Decision Lab |
+| Product | Scroll-controlled cinematic WebGL story, responsive command center, ranked recovery queue, explainable case drawer, agent playbooks, experiment analysis, audit trail, live modal flow, System Proof, replay challenge, and interactive Decision Lab |
 | Decision engine | Failure-aware action routing, confidence, approval/block modes, consent/contact/value/AFA gates, issuer holds, IST quiet-hour scheduling, evidence, and deterministic idempotency keys |
 | Hosted API | Strict runtime schema validation, byte-size limits, safe errors, no-store responses, request proof IDs, a safe live evidence endpoint, and an OpenAPI 3.1 contract |
 | Webhook boundary | Raw-body HMAC-SHA256 verification, secret fail-closed behavior, event-ID requirement, payload hash, and invalid-signature rejection |
@@ -46,14 +61,14 @@ All customers, amounts, uplift metrics, and payment outcomes visible in the UI a
 
 Use this path to see the strongest engineering story in under 90 seconds:
 
-1. Open the [command center](https://revive-revenue.vercel.app) and use **Backend live** to enter **System proof**.
-2. Run **Prove duplicate safety**. Two identical production requests must resolve to `stored → duplicate_suppressed`, backed by one immutable private record.
-3. In **Decision Lab**, try ₹47,999 to force approval, set two contacts to trigger a block, or disable issuer health to force a protective hold.
-4. Return to the command center and scan revenue-at-risk, uplift, safe-autonomy, and live-agent activity.
-5. Select **Review agent plan** to see which actions can run autonomously and which require approval.
-6. Open a priority case to inspect evidence, confidence, policy version, context, and the human override.
-7. Select **Run live demo**, then **Start simulation**. The browser calls the hosted API; success is impossible unless a real response returns a plan.
-8. Visit **Experiments** for treatment-versus-holdout measurement and **Audit trail** for explainability/proof.
+1. Open the [live product](https://revive-revenue.vercel.app) and scroll slowly through **Signal → Reason → Guardrail → Recovery**. The 3D engine dismantles, moves the camera through the system, and reassembles around ₹11,999 recovered.
+2. Select **Run live demo**, then **Start simulation**. The browser calls the hosted decision API; success is impossible unless a real response returns a valid plan.
+3. From the success state, select **Inspect audit proof** to move directly into **System proof**.
+4. Run **Prove duplicate safety**. Two identical production requests must resolve to `stored → duplicate_suppressed`, backed by one immutable private record.
+5. In **Decision Lab**, try ₹47,999 to force approval, set two contacts to trigger a block, or disable issuer health to force a protective hold.
+6. Return to the command center and scan revenue-at-risk, uplift, safe-autonomy, and live-agent activity.
+7. Select **Review agent plan** and open a priority case to inspect evidence, confidence, policy version, context, and the human override.
+8. Visit **Experiments** for treatment-versus-holdout measurement and **Audit trail** for explainability.
 9. Open [`/api/proof`](https://revive-revenue.vercel.app/api/proof) to inspect the deployed commit, region, runtime controls, endpoint inventory, and bounded private-store evidence independently of the UI.
 
 [![Revive live System Proof](docs/assets/revive-system-proof-live.jpg)](https://revive-revenue.vercel.app)
@@ -86,6 +101,26 @@ flowchart LR
 ```
 
 The checked-in slice implements the shaded center of this design: authenticated webhook ingestion, durable deduplication/audit, a deterministic plan, and the interactive proof flow. Real payment/message adapters, an outbox, and multi-tenant authorization remain explicit pilot blockers. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/ENGINEERING_AUDIT.md`](docs/ENGINEERING_AUDIT.md).
+
+### Cinematic frontend architecture
+
+```mermaid
+flowchart LR
+    S[Native scroll] --> M[Motion spring]
+    M --> P[Normalized story progress]
+    P --> C[Camera dolly + variable FOV]
+    P --> G[Shell + paths + rings + shockwaves]
+    X[Pointer position] --> L[Parallax + point light]
+    V[Viewport + device memory + frame time] --> Q[Adaptive geometry + pixel ratio]
+    R[Reduced-motion preference] --> F[Static readable scene]
+    C --> W[Three.js WebGL renderer]
+    G --> W
+    L --> W
+    Q --> W
+    F --> W
+```
+
+The full scene is isolated in a client-only component, while the landing-page copy, navigation, and conversion controls remain semantic React UI. Scroll changes update mutable Three.js state directly rather than forcing React renders on every frame.
 
 ## Hosted API
 
@@ -180,6 +215,9 @@ The exact deployment contract and verification evidence are in [`docs/DEPLOYMENT
 
 | Path | Responsibility |
 | --- | --- |
+| [`app/landing-page.tsx`](app/landing-page.tsx) | Semantic scroll narrative, chapter navigation, conversion actions, and motion-value orchestration |
+| [`app/revenue-core.tsx`](app/revenue-core.tsx) | Live Three.js scene, custom shader, signal flow, camera choreography, adaptive rendering, and cleanup |
+| [`app/landing.css`](app/landing.css) | Cinematic layout, typography, responsive composition, overlays, and reduced-motion treatment |
 | [`app/page.tsx`](app/page.tsx) | Interactive recruiter/demo experience and truth-linked API success state |
 | [`app/system-proof.tsx`](app/system-proof.tsx) | Live deployment evidence, duplicate replay challenge, and policy-boundary Decision Lab |
 | [`lib/recovery-engine.ts`](lib/recovery-engine.ts) | Deterministic action and policy engine |
@@ -197,7 +235,7 @@ The exact deployment contract and verification evidence are in [`docs/DEPLOYMENT
 
 ## Resume-ready bullet
 
-Built and publicly shipped an explainable revenue-recovery control plane for Razorpay subscriptions using Next.js 16, React 19, TypeScript, Vercel Functions, raw-body HMAC webhook authentication, immutable storage-enforced idempotency, an interactive production replay challenge, deterministic fintech guardrails, causal holdout analytics, 16 automated tests, and 95%+ core coverage.
+Built and publicly shipped an explainable revenue-recovery control plane for Razorpay subscriptions using Next.js 16, React 19, TypeScript, a scroll-controlled Three.js/WebGL product story with adaptive rendering, Vercel Functions, raw-body HMAC webhook authentication, immutable storage-enforced idempotency, an interactive production replay challenge, deterministic fintech guardrails, causal holdout analytics, 16 automated tests, and 95%+ core coverage.
 
 ## Production path
 

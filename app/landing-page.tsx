@@ -21,6 +21,7 @@ import {
   ReceiptIndianRupee,
   RefreshCcw,
   Route,
+  ScanLine,
   ShieldCheck,
   WalletCards,
   WifiOff,
@@ -147,6 +148,11 @@ export function LandingPage({ onOpenCommand, onRunDemo }: LandingPageProps) {
           <motion.div className="stage-glow lime" style={{ opacity: limeGlow }} />
           <motion.div className="stage-glow warm" style={{ opacity: warmGlow }} />
           <div className="stage-grain" />
+          <div className="stage-telemetry" aria-hidden="true">
+            <ScanLine size={13} />
+            <span>Live 3D engine</span>
+            <b>Scroll + pointer</b>
+          </div>
         </div>
 
         <section className="story-panel hero-panel" aria-labelledby="hero-title">

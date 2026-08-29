@@ -255,6 +255,27 @@ html { scroll-behavior: smooth; }
   background: repeating-radial-gradient(circle at 47% 53%, rgba(255, 255, 255, .018) 0 1px, transparent 1px 4px);
   mix-blend-mode: overlay;
 }
+.stage-telemetry {
+  position: absolute;
+  top: 108px;
+  right: clamp(28px, 4vw, 64px);
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 8px;
+  align-items: center;
+  border: 1px solid rgba(216, 255, 79, .18);
+  border-radius: 9px;
+  padding: 10px 12px;
+  background: rgba(4, 14, 10, .42);
+  color: var(--landing-lime);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .04), 0 16px 46px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(12px);
+  font-family: var(--font-geist-mono);
+  text-transform: uppercase;
+}
+.stage-telemetry svg { grid-row: 1 / 3; }
+.stage-telemetry span { font-size: 7px; font-weight: 650; letter-spacing: .12em; }
+.stage-telemetry b { color: #66756c; font-size: 6px; font-weight: 550; letter-spacing: .1em; }
 .core-loading {
   position: absolute;
   right: 9vw;
@@ -556,6 +577,7 @@ html { scroll-behavior: smooth; }
 @media (max-width: 1080px) {
   .landing-nav { grid-template-columns: 1fr auto; }
   .landing-nav nav { display: none; }
+  .stage-telemetry { display: none; }
   .hero-copy { width: min(670px, 62vw); }
   .chapter-copy { width: min(500px, 48vw); }
   .failure-grid { grid-template-columns: repeat(3, 1fr); }
