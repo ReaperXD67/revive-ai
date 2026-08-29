@@ -1,6 +1,7 @@
 # Revive Landing Page — Design QA
 
 - Source visual truth: `C:\\Users\\Aman\\.codex-cli\\generated_images\\01a0493a-6cc6-7d63-941a-64e256ecd084\\exec-dab6db30-813f-4058-8f12-b6519ff793cb.png`
+- Iteration baseline: `output/playwright/continue-audit-01-hero.png`, `output/playwright/continue-audit-02-reason.png`, and `output/playwright/continue-audit-04-demo-success.png`
 - Implementation: `http://127.0.0.1:3000/`
 - Desktop viewport: 1440 × 900 CSS px at deviceScaleFactor 1
 - Mobile viewport: 390 × 844 CSS px at deviceScaleFactor 1
@@ -31,6 +32,14 @@ No open P0, P1, or P2 issues.
 - Smoothed 375 px portrait: `output/playwright/revive-smooth-375-settled.png`
 - Smoothed 844 × 390 landscape: `output/playwright/revive-smooth-landscape-final.png`
 - Smoothed reduced-motion state: `output/playwright/revive-smooth-reduced-motion.png`
+- Continued-polish desktop hero: `output/playwright/continue-local-01-hero.png`
+- Continued-polish reason chapter: `output/playwright/continue-local-02-reason.png`
+- Continued-polish demo success: `output/playwright/continue-local-03-demo-success.png`
+- Continued-polish mobile hero: `output/playwright/continue-local-04-mobile-hero.png`
+- Continued-polish mobile demo success: `output/playwright/continue-local-05-mobile-demo-success.png`
+- Continued-polish 844 × 390 landscape: `output/playwright/continue-local-06-landscape.png`
+- Continued-polish reduced-motion state: `output/playwright/continue-local-07-reduced-motion.png`
+- Continued-polish 375 px portrait: `output/playwright/continue-local-08-375.png`
 - Desktop hero: `output/playwright/revive-desktop-hero-final.png`
 - Desktop signal: `output/playwright/revive-desktop-signal-final.png`
 - Desktop reason: `output/playwright/revive-desktop-reason-final.png`
@@ -45,6 +54,9 @@ No open P0, P1, or P2 issues.
 
 - Smoothed hero source crop beside implementation: `output/playwright/revive-smooth-comparison-hero.png`
 - Smoothed proof source crop beside implementation: `output/playwright/revive-smooth-comparison-proof.png`
+- Continued-polish hero baseline beside implementation: `output/playwright/continue-compare-hero.png`
+- Continued-polish reason baseline beside implementation: `output/playwright/continue-compare-reason.png`
+- Continued-polish demo baseline beside implementation: `output/playwright/continue-compare-demo.png`
 - Hero source crop beside implementation: `output/playwright/revive-comparison-hero.png`
 - Proof source crop beside implementation: `output/playwright/revive-comparison-proof.png`
 
@@ -57,6 +69,7 @@ The source is a tall presentation board, so focused source regions were normaliz
 - The dashboard logo returns to the scroll story.
 - Both landing-page and dashboard `Run live demo` controls open the recovery simulation.
 - `Start simulation` completes all four stages, calls the hosted recovery route, returns `₹11,999 recovered`, records request proof, and shows the verification toast.
+- The success state exposes `Inspect audit proof`, closes the modal, and opens the live System proof view.
 - The mobile dashboard header remains above scrolled content and its live-demo control is clickable.
 - Mobile document width is 375 CSS px inside a 390 CSS px viewport; no horizontal overflow is present.
 - Reduced-motion mode renders a stable landing state and suppresses long transitions.
@@ -71,5 +84,6 @@ The source is a tall presentation board, so focused source regions were normaliz
 - Iteration 3: mobile review found the dashboard header CTA could be intercepted after scroll. The mobile header was made fixed, layered, and translucent; the interaction was repeated successfully.
 - Iteration 4: combined hero and proof comparisons passed with no remaining P0/P1/P2 findings.
 - Iteration 5: replaced frame-dependent interpolation with delta-time damping, stabilized transparent materials, added adaptive render resolution and a lightweight energy spine, reduced mobile scene complexity, removed the expensive full-screen blur pass, and stopped replaying entry animations. A temporary mobile hash-position regression from off-screen paint containment was found and fixed by limiting containment to desktop. The short-landscape hero was tightened so both primary actions remain visible. Final desktop, 375 px portrait, short-landscape, mobile proof, reduced-motion, and main-demo checks passed again.
+- Iteration 6: audited the deployed recruiter journey, added a continuous story-progress line and active navigation state, expanded desktop chapter labels, corrected the Reason headline's copy and wrap, enlarged the recovery simulation's critical text, added live state announcements and initial modal focus, and created a direct success-to-proof continuation. Same-viewport hero, Reason, and demo comparisons found no new P0/P1/P2 drift. Desktop, 390 px mobile, 844 × 390 landscape, reduced-motion, console, build, and end-to-end proof checks passed.
 
 final result: passed

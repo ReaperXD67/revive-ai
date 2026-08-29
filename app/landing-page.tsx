@@ -109,11 +109,20 @@ export function LandingPage({ onOpenCommand, onRunDemo }: LandingPageProps) {
           <span>R</span><strong>Revive</strong>
         </button>
         <nav aria-label="Landing page navigation">
-          <button onClick={() => scrollTo('signal')}>How it works</button>
-          <button onClick={() => scrollTo('proof')}>Proof</button>
+          <button
+            className={activeChapter < 4 ? 'active' : ''}
+            onClick={() => scrollTo('signal')}
+            aria-current={activeChapter < 4 ? 'location' : undefined}
+          >How it works</button>
+          <button
+            className={activeChapter === 4 ? 'active' : ''}
+            onClick={() => scrollTo('proof')}
+            aria-current={activeChapter === 4 ? 'location' : undefined}
+          >Proof</button>
           <button onClick={onOpenCommand}>Command center</button>
         </nav>
         <button className="nav-demo" onClick={onRunDemo}>Run live demo <ArrowRight size={15} /></button>
+        <div className="landing-progress" aria-hidden="true"><motion.i style={{ scaleX: progressScale }} /></div>
       </header>
 
       <aside className="chapter-rail" aria-label="Recovery story progress">
@@ -183,9 +192,9 @@ export function LandingPage({ onOpenCommand, onRunDemo }: LandingPageProps) {
         </section>
 
         <section className="story-panel reason-panel" id="reason" aria-labelledby="reason-title">
-          <motion.div className="chapter-copy right" {...reveal}>
+          <motion.div className="chapter-copy reason-copy right" {...reveal}>
             <p className="chapter-kicker">02 · Reason classification</p>
-            <h2 id="reason-title">Classified<br /><em>before acted on.</em></h2>
+            <h2 id="reason-title">Classified<br /><em>before action.</em></h2>
             <p>Revive converts a noisy processor event into an explainable recovery route—with confidence, evidence, and a safe fallback.</p>
             <div className="reason-path">
               <span><RadioTower size={15} /><small>Signal</small><strong>insufficient_balance</strong></span>
